@@ -4,6 +4,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from math import pi, sin, cos
+from skewness_utils import analyze_skewness_with_graphics
 
 
 def print_section(title: str) -> None:
@@ -49,25 +51,40 @@ def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
     print_section("2) FEATURE ENGINEERING")
     out = df.copy()
 
+    # Temporal features (no data leakage)
     if "timestamp" in out.columns:
         out["timestamp"] = pd.to_datetime(out["timestamp"], errors="coerce")
         out["hour"] = out["timestamp"].dt.hour
         out["day_of_week"] = out["timestamp"].dt.dayofweek
         out["is_weekend"] = out["day_of_week"].isin([5, 6]).astype(int)
 
-    # New engineered features requested by the user.
-    if {"duration_traffic_min", "duration_normal_min"}.issubset(out.columns):
-        out["traffic_ratio"] = out["duration_traffic_min"] / out["duration_normal_min"]
+    # Route feature: concatenate origin and destination
+    if {"origin", "destination"}.issubset(out.columns):
+        out["route"] = out["origin"].astype(str) + " → " + out["destination"].astype(str)
 
+    # Rush hour feature (hours 7-9 and 16-18)
+    if "hour" in out.columns:
+        out["is_rush_hour"] = (
+            (out["hour"].isin(range(7, 10))) | (out["hour"].isin(range(16, 19)))
+        ).astype(int)
+
+    # Bad weather feature
+    if {"rain", "wind"}.issubset(out.columns):
+        out["is_bad_weather"] = ((out["rain"] > 0) | (out["wind"] > 8)).astype(int)
+
+    # Speed normal: distance / duration_normal_min (no leakage, only uses normal duration)
     if {"distance_km", "duration_normal_min"}.issubset(out.columns):
-        out["speed_normal"] = out["distance_km"] / out["duration_normal_min"]
+        epsilon = 1e-5
+        out["speed_normal"] = out["distance_km"] / (out["duration_normal_min"] + epsilon)
 
-    if {"distance_km", "duration_traffic_min"}.issubset(out.columns):
-        out["speed_traffic"] = out["distance_km"] / out["duration_traffic_min"]
+    # Cyclic encoding for hour
+    if "hour" in out.columns:
+        out["hour_sin"] = np.sin(2 * pi * out["hour"] / 24)
+        out["hour_cos"] = np.cos(2 * pi * out["hour"] / 24)
 
     out = out.replace([np.inf, -np.inf], np.nan)
 
-    print("Created: hour, day_of_week, is_weekend, traffic_ratio, speed_normal, speed_traffic")
+    print("Created: hour, day_of_week, is_weekend, route, is_rush_hour, is_bad_weather, speed_normal, hour_sin, hour_cos")
     return out
 
 
@@ -83,30 +100,41 @@ def clean_data(df: pd.DataFrame, remove_delay_outliers: bool = True) -> tuple[pd
     after_rows = len(cleaned)
     after_null = int(cleaned.isna().sum().sum())
 
+    # Domain-based filtering (real-world constraints), not statistical IQR filtering.
+    # We keep realistic heavy traffic behavior (large positive delays, long distances,
+    # and duration variation) and only remove impossible/noisy records.
     outlier_removed = 0
-    if remove_delay_outliers and "delay_min" in cleaned.columns:
-        q1 = cleaned["delay_min"].quantile(0.25)
-        q3 = cleaned["delay_min"].quantile(0.75)
-        iqr = q3 - q1
-        if iqr > 0:
-            low = q1 - 1.5 * iqr
-            high = q3 + 1.5 * iqr
-            before_outlier = len(cleaned)
-            cleaned = cleaned[(cleaned["delay_min"] >= low) & (cleaned["delay_min"] <= high)]
-            cleaned = cleaned.reset_index(drop=True)
-            outlier_removed = before_outlier - len(cleaned)
+    negative_delay_removed = 0
+    low_speed_removed = 0
+    if remove_delay_outliers:
+        if "delay_min" in cleaned.columns:
+            before_negative_delay = len(cleaned)
+            cleaned = cleaned[cleaned["delay_min"] > -5]
+            negative_delay_removed = before_negative_delay - len(cleaned)
+
+        if "speed_normal" in cleaned.columns:
+            before_low_speed = len(cleaned)
+            cleaned = cleaned[cleaned["speed_normal"] > 0.05]
+            low_speed_removed = before_low_speed - len(cleaned)
+
+        cleaned = cleaned.reset_index(drop=True)
+        outlier_removed = negative_delay_removed + low_speed_removed
 
     print(f"Rows before cleaning: {before_rows}")
     print(f"Rows after dropna+drop_duplicates: {after_rows}")
     print(f"Nulls before: {before_null}, nulls after: {after_null}")
-    print(f"Outliers removed in delay_min: {outlier_removed}")
+    print(f"Domain-filtered rows removed (total): {outlier_removed}")
+    print(f"  - delay_min <= -5 removed: {negative_delay_removed}")
+    print(f"  - speed_normal <= 0.05 removed: {low_speed_removed}")
 
     summary = {
         "rows_before": before_rows,
         "rows_after_dropna_dedup": after_rows,
         "null_before": before_null,
         "null_after": after_null,
-        "delay_outliers_removed": outlier_removed,
+        "domain_filtered_rows_removed": outlier_removed,
+        "negative_delay_removed": negative_delay_removed,
+        "low_speed_removed": low_speed_removed,
         "rows_final": len(cleaned),
     }
     return cleaned, summary
@@ -137,6 +165,43 @@ def create_target(df: pd.DataFrame, task: str) -> tuple[pd.DataFrame, str]:
     raise ValueError("Task must be one of: regression or classification")
 
 
+def encode_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply one-hot encoding to categorical features."""
+    print_section("ENCODE FEATURES")
+    out = df.copy()
+
+    # One-hot encode route column
+    if "route" in out.columns:
+        route_encoded = pd.get_dummies(out["route"], prefix="route", drop_first=True)
+        out = pd.concat([out, route_encoded], axis=1)
+        print(f"Created {len(route_encoded.columns)} route encoding columns")
+
+    return out
+
+
+def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop columns that are not needed for modeling (prevent data leakage and reduce dimensionality)."""
+    print_section("DROP UNUSED COLUMNS")
+    out = df.copy()
+
+    # Columns to drop
+    columns_to_drop = [
+        "timestamp",      # Not needed after extracting temporal features
+        "origin",         # Not needed after creating route
+        "destination",    # Not needed after creating route
+        "route",          # Drop after one-hot encoding
+        "hour",           # Not needed after sin/cos encoding
+        "duration_traffic_min",  # IMPORTANT: Remove to prevent data leakage
+    ]
+
+    # Drop only columns that exist in the dataframe
+    existing_to_drop = [col for col in columns_to_drop if col in out.columns]
+    out = out.drop(columns=existing_to_drop)
+
+    print(f"Dropped columns: {existing_to_drop}")
+    return out
+
+
 def analyze_data_quality(df: pd.DataFrame) -> dict:
     print_section("5) DATA QUALITY")
     total_missing = int(df.isna().sum().sum())
@@ -164,7 +229,7 @@ def analyze_data_quality(df: pd.DataFrame) -> dict:
 
 
 def print_full_terminal_report(original_df: pd.DataFrame, final_df: pd.DataFrame, target_col: str, task: str) -> dict:
-    print_section("6) FULL TERMINAL REPORT")
+    print_section("7) FULL TERMINAL REPORT")
 
     original_mem_mb = original_df.memory_usage(deep=True).sum() / (1024**2)
     final_mem_mb = final_df.memory_usage(deep=True).sum() / (1024**2)
@@ -214,7 +279,7 @@ def print_full_terminal_report(original_df: pd.DataFrame, final_df: pd.DataFrame
 
 
 def save_outputs(df: pd.DataFrame, target_col: str, output_dir: Path, task: str, report: dict) -> None:
-    print_section("7) OUTPUT EXPORT")
+    print_section("8) OUTPUT EXPORT")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     dataset_path = output_dir / f"cleaned_dataset_{task}.csv"
@@ -264,8 +329,18 @@ def main() -> None:
     type_groups = analyze_data_types(df)
     df_fe = feature_engineering(df)
     df_clean, clean_summary = clean_data(df_fe, remove_delay_outliers=(not args.keep_outliers))
-    df_final, target_col = create_target(df_clean, args.task)
+    df_encoded = encode_features(df_clean)
+
+    duplicates_after_encoding = int(df_encoded.duplicated().sum())
+    print(f"Duplicate rows after encoding: {duplicates_after_encoding}")
+    if duplicates_after_encoding > 0:
+        df_encoded = df_encoded.drop_duplicates().reset_index(drop=True)
+        print(f"Removed duplicates after encoding: {duplicates_after_encoding}")
+
+    df_final = drop_unused_columns(df_encoded)
+    df_final, target_col = create_target(df_final, args.task)
     quality_summary = analyze_data_quality(df_final)
+    skewness_summary = analyze_skewness_with_graphics(df_final, Path(args.output_dir))
     terminal_summary = print_full_terminal_report(df, df_final, target_col, args.task)
 
     report = {
@@ -276,14 +351,18 @@ def main() -> None:
         "type_groups": type_groups,
         "cleaning": clean_summary,
         "quality": quality_summary,
+        "skewness": skewness_summary,
         "terminal_summary": terminal_summary,
         "created_features": [
             "hour",
             "day_of_week",
             "is_weekend",
-            "traffic_ratio",
+            "route",
+            "is_rush_hour",
+            "is_bad_weather",
             "speed_normal",
-            "speed_traffic",
+            "hour_sin",
+            "hour_cos",
         ],
     }
 
