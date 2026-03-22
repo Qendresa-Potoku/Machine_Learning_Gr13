@@ -299,61 +299,6 @@ def profile_completeness(df: pd.DataFrame, label: str = "dataset") -> dict:
     }
 
 
-def suggest_missing_value_strategy(df: pd.DataFrame) -> dict[str, str]:
-    print_section("MISSING VALUE STRATEGY")
-
-    strategy: dict[str, str] = {}
-    for col in df.columns:
-        null_ratio = float(df[col].isna().mean())
-        if null_ratio == 0:
-            strategy[col] = "-"
-            continue
-
-        if null_ratio > 0.4:
-            strategy[col] = "drop_column_or_domain_review"
-            continue
-
-        if pd.api.types.is_numeric_dtype(df[col]):
-            strategy[col] = "median_imputation"
-        elif pd.api.types.is_datetime64_any_dtype(df[col]):
-            strategy[col] = "forward_fill_then_backward_fill"
-        else:
-            strategy[col] = "mode_imputation"
-
-    for col, action in strategy.items():
-        print(f"  - {col:25}: {action}")
-
-    return strategy
-
-
-def apply_missing_value_strategy(df: pd.DataFrame, strategy: dict[str, str]) -> pd.DataFrame:
-    print_section("APPLY MISSING VALUE STRATEGY")
-    out = df.copy()
-
-    for col, action in strategy.items():
-        if col not in out.columns:
-            continue
-
-        if action == "-":
-            continue
-        if action == "drop_column_or_domain_review":
-            out = out.drop(columns=[col])
-            continue
-        if action == "median_imputation" and pd.api.types.is_numeric_dtype(out[col]):
-            out[col] = out[col].fillna(out[col].median())
-            continue
-        if action == "mode_imputation":
-            mode_vals = out[col].mode(dropna=True)
-            if not mode_vals.empty:
-                out[col] = out[col].fillna(mode_vals.iloc[0])
-            continue
-        if action == "forward_fill_then_backward_fill":
-            out[col] = out[col].ffill().bfill()
-
-    print("Missing value strategy applied.")
-    return out
-
-
 def detect_outliers_iqr(
     df: pd.DataFrame,
     min_unique_for_continuous: int = 10,
@@ -427,25 +372,14 @@ def detect_outliers_iqr(
 def print_full_terminal_report(original_df: pd.DataFrame, final_df: pd.DataFrame, target_col: str, task: str) -> dict:
     print_section("7) FULL TERMINAL REPORT")
 
-    original_mem_mb = original_df.memory_usage(deep=True).sum() / (1024**2)
-    final_mem_mb = final_df.memory_usage(deep=True).sum() / (1024**2)
-
     print("Data shape:")
     print(f"  - Original: {original_df.shape[0]:,} rows, {original_df.shape[1]} columns")
     print(f"  - Processed: {final_df.shape[0]:,} rows, {final_df.shape[1]} columns")
-
-    print("\nMemory usage:")
-    print(f"  - Original: {original_mem_mb:.2f} MB")
-    print(f"  - Processed: {final_mem_mb:.2f} MB")
 
     print("\nColumns in processed dataset:")
     for col in final_df.columns:
         print(f"  - {col}")
 
-    print("\nPer-column memory usage (MB):")
-    col_mem = (final_df.memory_usage(deep=True) / (1024**2)).sort_values(ascending=False)
-    for col, mem_mb in col_mem.items():
-        print(f"  - {col:25}: {mem_mb:10.4f} MB")
 
     numeric_cols = final_df.select_dtypes(include=[np.number]).columns.tolist()
     continuous_numeric_cols = [
@@ -479,8 +413,6 @@ def print_full_terminal_report(original_df: pd.DataFrame, final_df: pd.DataFrame
     return {
         "original_shape": [int(original_df.shape[0]), int(original_df.shape[1])],
         "processed_shape": [int(final_df.shape[0]), int(final_df.shape[1])],
-        "original_memory_mb": round(float(original_mem_mb), 2),
-        "processed_memory_mb": round(float(final_mem_mb), 2),
         "processed_columns": final_df.columns.tolist(),
     }
 
@@ -509,7 +441,6 @@ def main() -> None:
     task = "regression"
     output_dir = "outputs"
     keep_outliers = False
-    impute_missing = False
     scaling = "standard"
     outlier_min_unique = 10
 
@@ -526,12 +457,14 @@ def main() -> None:
     completeness_original = profile_completeness(df, label="original")
 
     df_fe = feature_engineering(df)
-    missing_strategy = suggest_missing_value_strategy(df_fe)
-
-    if impute_missing:
-        df_pre_clean = apply_missing_value_strategy(df_fe, missing_strategy)
+    total_missing_after_fe = int(df_fe.isna().sum().sum())
+    if total_missing_after_fe > 0:
+        print(f"Missing values detected after feature engineering: {total_missing_after_fe}")
+        print("Missing rows will be handled by dropna() in clean_data.")
     else:
-        df_pre_clean = df_fe
+        print("No missing values detected before cleaning.")
+
+    df_pre_clean = df_fe
 
     df_clean, clean_summary = clean_data(df_pre_clean, remove_delay_outliers=(not keep_outliers))
     df_encoded = encode_features(df_clean)
@@ -583,7 +516,6 @@ def main() -> None:
             "original": completeness_original,
             "final": completeness_final,
         },
-        "missing_value_strategy": missing_strategy,
         "cleaning": clean_summary,
         "quality": quality_summary,
         "skewness": skewness_summary,

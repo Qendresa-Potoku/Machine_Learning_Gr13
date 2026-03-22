@@ -43,7 +43,6 @@ The pipeline is designed for machine learning preparation and supports:
 - dataset scope selection (full vs sampled)
 - feature engineering for temporal and route context
 - data cleaning and domain-based filtering
-- optional missing-value imputation
 - encoding and scaling
 - skewness analysis with generated plots
 - IQR-based outlier analysis for continuous variables
@@ -110,51 +109,45 @@ Based on the pipeline typing groups, the core attributes are:
 
 ![Feature Engineering](ReadMe-Images/Feature%20Engineering.png)
 
-4. **Missing Value Strategy (suggest_missing_value_strategy, apply_missing_value_strategy)**
-- **Functionality:** Suggests and optionally applies column-wise missing-value handling rules.
-- **Logic:** Chooses median, mode, fill, or drop actions based on dtype and null ratio.
-
-![Missing Value Strategy](ReadMe-Images/Missing%20Value%20Strategy.png)
-
-5. **Data Cleaning (clean_data)**
+4. **Data Cleaning (clean_data)**
 - **Functionality:** Removes nulls, duplicates, and domain-invalid rows.
-- **Logic:** Applies filtering rules including delay_min > -5 and speed_normal > 0.05.
+- **Logic:** Drops missing rows (`dropna`), removes duplicates, and applies domain filters (`delay_min > -5`, `speed_normal > 0.05`).
 
 ![Data Cleaning](ReadMe-Images/Data%20Cleaning.png)
 
-6. **Categorical Encoding (encode_features)**
+5. **Categorical Encoding (encode_features)**
 - **Functionality:** Converts route text into model-ready binary indicators.
 - **Logic:** Uses one-hot encoding via pd.get_dummies for the route feature.
 
 ![Categorical Encoding](ReadMe-Images/Categorical%20Encoding.png)
 
-7. **Column Pruning (drop_unused_columns)**
+6. **Column Pruning (drop_unused_columns)**
 - **Functionality:** Drops raw, non-model columns and leakage-prone fields.
 - **Logic:** Removes timestamp, origin, destination, route, hour, and duration_traffic_min.
 
 ![Column Pruning](ReadMe-Images/Column%20Pruning.png)
 
-8. **Target Creation (create_target)**
+7. **Target Creation (create_target)**
 - **Functionality:** Defines the prediction target based on selected ML task.
 - **Logic:** Uses delay_min for regression or generates traffic_level bins for classification.
 
-9. **Normalization (normalize_features)**
+8. **Normalization (normalize_features)**
 - **Functionality:** Scales continuous numeric features for model compatibility.
 - **Logic:** Applies StandardScaler or MinMaxScaler while excluding target and binary-like columns.
 
-10. **Quality and Completeness (analyze_data_quality, profile_completeness)**
+9. **Quality and Completeness (analyze_data_quality, profile_completeness)**
 - **Functionality:** Reports dataset quality after transformations.
 - **Logic:** Computes missing values, duplicates, quality score, and completeness metrics.
 
-11. **Outlier Detection (detect_outliers_iqr)**
+10. **Outlier Detection (detect_outliers_iqr)**
 - **Functionality:** Measures outlier counts for continuous features.
 - **Logic:** Uses IQR bounds with exclusion rules for encoded, binary, and low-cardinality columns.
 
-12. **Terminal Report (print_full_terminal_report)**
+11. **Terminal Report (print_full_terminal_report)**
 - **Functionality:** Generates a full end-of-pipeline textual summary.
-- **Logic:** Prints shape changes, memory usage, numeric summaries, and target distribution.
+- **Logic:** Prints shape changes, numeric summaries, and target distribution.
 
-13. **Output Export (save_outputs)**
+12. **Output Export (save_outputs)**
 - **Functionality:** Saves final artifacts for downstream work.
 - **Logic:** Writes cleaned dataset CSV and structured JSON report into outputs.
 
@@ -209,25 +202,24 @@ From the latest generated report in [outputs/cleaned_report_regression.json](out
 
 - Task: regression
 - Target: `delay_min`
-- Original shape: 28,799 rows x 13 columns
-- Processed shape: 24,103 rows x 56 columns
-- Original memory: 8.42 MB
-- Processed memory: 3.38 MB
+- Run mode: full dataset
+- Original shape: 32,070 rows x 13 columns
+- Processed shape: 26,926 rows x 56 columns
 
 ### Cleaning Summary
 
-- Rows after `dropna + drop_duplicates`: 28,779
-- Domain-filtered rows removed: 4,676
+- Rows after `dropna + drop_duplicates`: 32,050
+- Domain-filtered rows removed: 5,124
   - `delay_min <= -5`: 726
-  - `speed_normal <= 0.05`: 3,950
+  - `speed_normal <= 0.05`: 4,398
 
 ### Skewness Highlights
 
 Most skewed continuous features (absolute skewness):
-- `distance_km`: 3.1972
-- `speed_normal`: 1.9447
-- `duration_normal_min`: 1.2915
-- `delay_min`: 1.2659
+- `distance_km`: 3.1573
+- `speed_normal`: 1.9298
+- `delay_min`: 1.3974
+- `duration_normal_min`: 1.2831
 
 Generated plots:
 
