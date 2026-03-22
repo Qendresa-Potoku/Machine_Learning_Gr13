@@ -92,55 +92,57 @@ Based on the pipeline typing groups, the core attributes are:
 
 ### Main Pipeline: [data_analysis.py](data_analysis.py)
 
-1. `choose_dataset_scope`
-- Interactive choice between full dataset and random sample.
+1. **Dataset Scope Selection (choose_dataset_scope)**
+- **Functionality:** Lets the user choose full-dataset processing or sampled processing.
+- **Logic:** Uses interactive input and reproducible random sampling when sample mode is selected.
 
-2. `analyze_data_types`
-- Validates expected type groups and reports missing columns.
+2. **Data Type Analysis (analyze_data_types)**
+- **Functionality:** Checks expected feature groups (numeric, categorical, temporal, binary, discrete).
+- **Logic:** Verifies column presence per group and prints dtype diagnostics for each column.
 
-3. `feature_engineering`
-- Creates features:
-  - temporal: `hour`, `day_of_week`, `is_weekend`
-  - route: `route`
-  - traffic context: `is_rush_hour`
-  - weather context: `is_bad_weather`
-  - ratio feature: `speed_normal`
-  - cyclic encoding: `hour_sin`, `hour_cos`
+3. **Feature Engineering (feature_engineering)**
+- **Functionality:** Creates additional features for time, weather, route context, and cyclic hour encoding.
+- **Logic:** Derives hour, day_of_week, is_weekend, route, is_rush_hour, is_bad_weather, speed_normal, hour_sin, and hour_cos.
 
-4. Missing-value strategy
-- `suggest_missing_value_strategy` proposes column-wise actions.
-- `apply_missing_value_strategy` applies imputation/drop rules when enabled.
+4. **Missing Value Strategy (suggest_missing_value_strategy, apply_missing_value_strategy)**
+- **Functionality:** Suggests and optionally applies column-wise missing-value handling rules.
+- **Logic:** Chooses median, mode, fill, or drop actions based on dtype and null ratio.
 
-5. `clean_data`
-- Removes null rows and duplicates.
-- Applies domain filters:
-  - removes rows with `delay_min <= -5`
-  - removes rows with `speed_normal <= 0.05`
+5. **Data Cleaning (clean_data)**
+- **Functionality:** Removes nulls, duplicates, and domain-invalid rows.
+- **Logic:** Applies filtering rules including delay_min > -5 and speed_normal > 0.05.
 
-6. `encode_features`
-- One-hot encodes `route` using `pd.get_dummies`.
+6. **Categorical Encoding (encode_features)**
+- **Functionality:** Converts route text into model-ready binary indicators.
+- **Logic:** Uses one-hot encoding via pd.get_dummies for the route feature.
 
-7. `drop_unused_columns`
-- Drops raw columns no longer needed for modeling and removes leakage-prone column `duration_traffic_min`.
+7. **Column Pruning (drop_unused_columns)**
+- **Functionality:** Drops raw, non-model columns and leakage-prone fields.
+- **Logic:** Removes timestamp, origin, destination, route, hour, and duration_traffic_min.
 
-8. `create_target`
-- Builds the target according to selected task.
+8. **Target Creation (create_target)**
+- **Functionality:** Defines the prediction target based on selected ML task.
+- **Logic:** Uses delay_min for regression or generates traffic_level bins for classification.
 
-9. `normalize_features`
-- Supports `standard`, `minmax`, or no scaling.
-- Excludes binary-like columns and target from scaling.
+9. **Normalization (normalize_features)**
+- **Functionality:** Scales continuous numeric features for model compatibility.
+- **Logic:** Applies StandardScaler or MinMaxScaler while excluding target and binary-like columns.
 
-10. `analyze_data_quality` and `profile_completeness`
-- Reports missingness, duplicates, completeness score, and per-column completeness.
+10. **Quality and Completeness (analyze_data_quality, profile_completeness)**
+- **Functionality:** Reports dataset quality after transformations.
+- **Logic:** Computes missing values, duplicates, quality score, and completeness metrics.
 
-11. `detect_outliers_iqr`
-- IQR outlier counting on continuous numeric features with exclusion rules for prefixes/keywords.
+11. **Outlier Detection (detect_outliers_iqr)**
+- **Functionality:** Measures outlier counts for continuous features.
+- **Logic:** Uses IQR bounds with exclusion rules for encoded, binary, and low-cardinality columns.
 
-12. `print_full_terminal_report`
-- Prints shape, memory usage, column list, and summary statistics.
+12. **Terminal Report (print_full_terminal_report)**
+- **Functionality:** Generates a full end-of-pipeline textual summary.
+- **Logic:** Prints shape changes, memory usage, numeric summaries, and target distribution.
 
-13. `save_outputs`
-- Exports cleaned dataset CSV and detailed JSON report.
+13. **Output Export (save_outputs)**
+- **Functionality:** Saves final artifacts for downstream work.
+- **Logic:** Writes cleaned dataset CSV and structured JSON report into outputs.
 
 ### Plot Utility: [skewness_utils.py](skewness_utils.py)
 
@@ -251,5 +253,7 @@ Generated plots:
 ---
 
 ## License
+
+
 
 
