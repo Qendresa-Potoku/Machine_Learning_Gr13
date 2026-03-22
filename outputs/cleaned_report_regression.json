@@ -3,8 +3,8 @@
   "input_file": "traffic_dataset.csv",
   "target_col": "delay_min",
   "shape_final": [
-    26926,
-    56
+    32070,
+    63
   ],
   "type_groups": {
     "numeric": [
@@ -70,10 +70,10 @@
       }
     },
     "final": {
-      "rows": 26926,
-      "columns": 56,
-      "total_cells": 1507856,
-      "complete_cells": 1507856,
+      "rows": 32070,
+      "columns": 63,
+      "total_cells": 2020410,
+      "complete_cells": 2020410,
       "null_cells": 0,
       "column_nulls": {
         "distance_km": 0,
@@ -107,9 +107,12 @@
         "route_Germia Park, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": 0,
         "route_Grand Prishtina Mall, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo": 0,
         "route_Kalabria, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
+        "route_Lisja, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
         "route_Lisja, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": 0,
         "route_Maklleshi, Prishtine, Kosovo → Emshir, Prishtine, Kosovo": 0,
         "route_Maklleshi, Prishtine, Kosovo → Gazi Rada, Prishtine, Kosovo": 0,
+        "route_Maklleshi, Prishtine, Kosovo → Lisja, Prishtine, Kosovo": 0,
+        "route_Maklleshi, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
         "route_Prishtina Airport, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
         "route_Prishtina e RE, Prishtine, Kosovo → Dardania, Prishtine, Kosovo": 0,
         "route_Prishtine Center, Prishtine, Kosovo → Albi Mall, Prishtine, Kosovo": 0,
@@ -120,14 +123,18 @@
         "route_Prishtine Center, Prishtine, Kosovo → Germia Park, Prishtine, Kosovo": 0,
         "route_Prishtine Center, Prishtine, Kosovo → Grand Prishtina Mall, Prishtine, Kosovo": 0,
         "route_Prishtine Center, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo": 0,
+        "route_Prishtine Center, Prishtine, Kosovo → Lisja, Prishtine, Kosovo": 0,
+        "route_Prishtine Center, Prishtine, Kosovo → Maklleshi, Prishtine, Kosovo": 0,
         "route_Prishtine Center, Prishtine, Kosovo → Prishtina e RE, Prishtine, Kosovo": 0,
         "route_Prishtine Center, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": 0,
         "route_Prishtine Center, Prishtine, Kosovo → Veternik, Prishtine, Kosovo": 0,
         "route_Prishtine Center, Prishtine, Kosovo → Zahir Pajaziti, Prishtine, Kosovo": 0,
+        "route_Prishtine Hospital, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
         "route_Qafa, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
         "route_Sunny Hill, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
         "route_Sunny Hill, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo": 0,
         "route_Ulpiana, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo": 0,
+        "route_University of Prishtina, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
         "route_Veternik, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo": 0,
         "route_Veternik, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 0,
         "route_Zahir Pajaziti, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo": 0,
@@ -165,9 +172,12 @@
         "route_Germia Park, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": 100.0,
         "route_Grand Prishtina Mall, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo": 100.0,
         "route_Kalabria, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
+        "route_Lisja, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
         "route_Lisja, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": 100.0,
         "route_Maklleshi, Prishtine, Kosovo → Emshir, Prishtine, Kosovo": 100.0,
         "route_Maklleshi, Prishtine, Kosovo → Gazi Rada, Prishtine, Kosovo": 100.0,
+        "route_Maklleshi, Prishtine, Kosovo → Lisja, Prishtine, Kosovo": 100.0,
+        "route_Maklleshi, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
         "route_Prishtina Airport, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
         "route_Prishtina e RE, Prishtine, Kosovo → Dardania, Prishtine, Kosovo": 100.0,
         "route_Prishtine Center, Prishtine, Kosovo → Albi Mall, Prishtine, Kosovo": 100.0,
@@ -178,14 +188,18 @@
         "route_Prishtine Center, Prishtine, Kosovo → Germia Park, Prishtine, Kosovo": 100.0,
         "route_Prishtine Center, Prishtine, Kosovo → Grand Prishtina Mall, Prishtine, Kosovo": 100.0,
         "route_Prishtine Center, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo": 100.0,
+        "route_Prishtine Center, Prishtine, Kosovo → Lisja, Prishtine, Kosovo": 100.0,
+        "route_Prishtine Center, Prishtine, Kosovo → Maklleshi, Prishtine, Kosovo": 100.0,
         "route_Prishtine Center, Prishtine, Kosovo → Prishtina e RE, Prishtine, Kosovo": 100.0,
         "route_Prishtine Center, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": 100.0,
         "route_Prishtine Center, Prishtine, Kosovo → Veternik, Prishtine, Kosovo": 100.0,
         "route_Prishtine Center, Prishtine, Kosovo → Zahir Pajaziti, Prishtine, Kosovo": 100.0,
+        "route_Prishtine Hospital, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
         "route_Qafa, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
         "route_Sunny Hill, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
         "route_Sunny Hill, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo": 100.0,
         "route_Ulpiana, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo": 100.0,
+        "route_University of Prishtina, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
         "route_Veternik, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo": 100.0,
         "route_Veternik, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": 100.0,
         "route_Zahir Pajaziti, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo": 100.0,
@@ -195,50 +209,71 @@
   },
   "cleaning": {
     "rows_before": 32070,
-    "rows_after_dropna_dedup": 32050,
+    "rows_after_impute_dedup": 32070,
     "null_before": 60,
     "null_after": 0,
-    "domain_filtered_rows_removed": 5124,
-    "negative_delay_removed": 726,
-    "low_speed_removed": 4398,
-    "rows_final": 26926
+    "median_imputed_columns": [
+      "temperature",
+      "wind",
+      "rain"
+    ],
+    "iqr_outlier_counts_selected": {
+      "delay_min": 4328,
+      "speed_normal": 6270,
+      "distance_km": 2046,
+      "duration_normal_min": 755
+    },
+    "iqr_outlier_rows_removed": 0,
+    "winsorized_columns": {
+      "delay_min": {
+        "p01": -5.55,
+        "p99": 9.9062,
+        "values_clipped": 641
+      },
+      "speed_normal": {
+        "p01": 0.0,
+        "p99": 0.768678,
+        "values_clipped": 106
+      }
+    },
+    "rows_final": 32070
   },
   "quality": {
     "total_missing": 0,
-    "duplicate_rows": 2178,
+    "duplicate_rows": 5723,
     "quality_score": 100.0
   },
   "skewness": {
     "plot_dir": "outputs\\skewness_plots",
     "plotted_columns": [
       "distance_km",
-      "speed_normal",
       "delay_min",
-      "duration_normal_min",
       "wind",
+      "duration_normal_min",
       "hour_sin",
       "temperature",
-      "hour_cos"
+      "hour_cos",
+      "speed_normal"
     ],
     "skewness": {
-      "distance_km": 3.1573,
-      "speed_normal": 1.9298,
-      "delay_min": 1.3974,
-      "duration_normal_min": 1.2831,
-      "wind": 0.726,
-      "hour_sin": 0.4873,
-      "temperature": -0.385,
-      "hour_cos": 0.1822
+      "distance_km": 2.7787,
+      "delay_min": 1.1848,
+      "wind": 0.7558,
+      "duration_normal_min": 0.5822,
+      "hour_sin": 0.4439,
+      "temperature": -0.3481,
+      "hour_cos": 0.1298,
+      "speed_normal": 0.0084
     },
     "outlier_counts_iqr": {
-      "distance_km": 2009,
-      "speed_normal": 1786,
-      "delay_min": 2134,
-      "duration_normal_min": 1336,
-      "wind": 2109,
+      "distance_km": 2046,
+      "delay_min": 4328,
+      "wind": 2447,
+      "duration_normal_min": 755,
       "hour_sin": 0,
       "temperature": 0,
-      "hour_cos": 0
+      "hour_cos": 0,
+      "speed_normal": 6270
     }
   },
   "outliers_iqr": {
@@ -264,11 +299,11 @@
       "hour_cos"
     ],
     "outlier_counts": {
-      "distance_km": 2009,
-      "duration_normal_min": 1336,
+      "distance_km": 2046,
+      "duration_normal_min": 755,
       "temperature": 0,
-      "wind": 2109,
-      "speed_normal": 1786,
+      "wind": 2447,
+      "speed_normal": 6270,
       "hour_sin": 0,
       "hour_cos": 0
     },
@@ -297,9 +332,12 @@
       "route_Germia Park, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Grand Prishtina Mall, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Kalabria, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
+      "route_Lisja, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Lisja, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Maklleshi, Prishtine, Kosovo → Emshir, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Maklleshi, Prishtine, Kosovo → Gazi Rada, Prishtine, Kosovo": "excluded_by_prefix",
+      "route_Maklleshi, Prishtine, Kosovo → Lisja, Prishtine, Kosovo": "excluded_by_prefix",
+      "route_Maklleshi, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtina Airport, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtina e RE, Prishtine, Kosovo → Dardania, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtine Center, Prishtine, Kosovo → Albi Mall, Prishtine, Kosovo": "excluded_by_prefix",
@@ -310,14 +348,18 @@
       "route_Prishtine Center, Prishtine, Kosovo → Germia Park, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtine Center, Prishtine, Kosovo → Grand Prishtina Mall, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtine Center, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo": "excluded_by_prefix",
+      "route_Prishtine Center, Prishtine, Kosovo → Lisja, Prishtine, Kosovo": "excluded_by_prefix",
+      "route_Prishtine Center, Prishtine, Kosovo → Maklleshi, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtine Center, Prishtine, Kosovo → Prishtina e RE, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtine Center, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtine Center, Prishtine, Kosovo → Veternik, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Prishtine Center, Prishtine, Kosovo → Zahir Pajaziti, Prishtine, Kosovo": "excluded_by_prefix",
+      "route_Prishtine Hospital, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Qafa, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Sunny Hill, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Sunny Hill, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Ulpiana, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo": "excluded_by_prefix",
+      "route_University of Prishtina, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Veternik, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Veternik, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo": "excluded_by_prefix",
       "route_Zahir Pajaziti, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo": "excluded_by_prefix",
@@ -334,8 +376,8 @@
       13
     ],
     "processed_shape": [
-      26926,
-      56
+      32070,
+      63
     ],
     "processed_columns": [
       "distance_km",
@@ -369,9 +411,12 @@
       "route_Germia Park, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo",
       "route_Grand Prishtina Mall, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo",
       "route_Kalabria, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",
+      "route_Lisja, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",
       "route_Lisja, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo",
       "route_Maklleshi, Prishtine, Kosovo → Emshir, Prishtine, Kosovo",
       "route_Maklleshi, Prishtine, Kosovo → Gazi Rada, Prishtine, Kosovo",
+      "route_Maklleshi, Prishtine, Kosovo → Lisja, Prishtine, Kosovo",
+      "route_Maklleshi, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",
       "route_Prishtina Airport, Kosovo → Prishtine Center, Prishtine, Kosovo",
       "route_Prishtina e RE, Prishtine, Kosovo → Dardania, Prishtine, Kosovo",
       "route_Prishtine Center, Prishtine, Kosovo → Albi Mall, Prishtine, Kosovo",
@@ -382,14 +427,18 @@
       "route_Prishtine Center, Prishtine, Kosovo → Germia Park, Prishtine, Kosovo",
       "route_Prishtine Center, Prishtine, Kosovo → Grand Prishtina Mall, Prishtine, Kosovo",
       "route_Prishtine Center, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo",
+      "route_Prishtine Center, Prishtine, Kosovo → Lisja, Prishtine, Kosovo",
+      "route_Prishtine Center, Prishtine, Kosovo → Maklleshi, Prishtine, Kosovo",
       "route_Prishtine Center, Prishtine, Kosovo → Prishtina e RE, Prishtine, Kosovo",
       "route_Prishtine Center, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo",
       "route_Prishtine Center, Prishtine, Kosovo → Veternik, Prishtine, Kosovo",
       "route_Prishtine Center, Prishtine, Kosovo → Zahir Pajaziti, Prishtine, Kosovo",
+      "route_Prishtine Hospital, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",
       "route_Qafa, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",
       "route_Sunny Hill, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",
       "route_Sunny Hill, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo",
       "route_Ulpiana, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo",
+      "route_University of Prishtina, Kosovo → Prishtine Center, Prishtine, Kosovo",
       "route_Veternik, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo",
       "route_Veternik, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",
       "route_Zahir Pajaziti, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo",

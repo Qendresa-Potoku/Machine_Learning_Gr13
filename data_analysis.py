@@ -104,50 +104,98 @@ def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def clean_data(df: pd.DataFrame, remove_delay_outliers: bool = True) -> tuple[pd.DataFrame, dict]:
+def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     print_section("3) DATA CLEANING")
     cleaned = df.copy()
 
     before_rows = len(cleaned)
     before_null = int(cleaned.isna().sum().sum())
 
-    cleaned = cleaned.dropna().drop_duplicates().reset_index(drop=True)
+    # Fill missing values with median for numeric attributes.
+    numeric_cols = cleaned.select_dtypes(include=[np.number]).columns.tolist()
+    median_imputed_cols: list[str] = []
+    for col in numeric_cols:
+        if cleaned[col].isna().any():
+            cleaned[col] = cleaned[col].fillna(cleaned[col].median())
+            median_imputed_cols.append(col)
+
+    # Remove duplicate rows after imputation.
+    cleaned = cleaned.drop_duplicates().reset_index(drop=True)
 
     after_rows = len(cleaned)
     after_null = int(cleaned.isna().sum().sum())
 
-    outlier_removed = 0
-    negative_delay_removed = 0
-    low_speed_removed = 0
-    if remove_delay_outliers:
-        if "delay_min" in cleaned.columns:
-            before_negative_delay = len(cleaned)
-            cleaned = cleaned[cleaned["delay_min"] > -5]
-            negative_delay_removed = before_negative_delay - len(cleaned)
+    columns_to_check_iqr = [
+        "delay_min",
+        "speed_normal",
+        "distance_km",
+        "duration_normal_min",
+    ]
 
-        if "speed_normal" in cleaned.columns:
-            before_low_speed = len(cleaned)
-            cleaned = cleaned[cleaned["speed_normal"] > 0.05]
-            low_speed_removed = before_low_speed - len(cleaned)
+    # Check IQR outlier counts for selected continuous columns.
+    iqr_outlier_counts_selected: dict[str, int] = {}
+    for col in columns_to_check_iqr:
+        if col not in cleaned.columns:
+            continue
+        series = cleaned[col]
+        if series.nunique(dropna=True) <= 10:
+            iqr_outlier_counts_selected[col] = 0
+            continue
+        q1 = series.quantile(0.25)
+        q3 = series.quantile(0.75)
+        iqr = q3 - q1
+        if iqr <= 0:
+            iqr_outlier_counts_selected[col] = 0
+            continue
+        low = q1 - 1.5 * iqr
+        high = q3 + 1.5 * iqr
+        iqr_outlier_counts_selected[col] = int(((series < low) | (series > high)).sum())
 
-        cleaned = cleaned.reset_index(drop=True)
-        outlier_removed = negative_delay_removed + low_speed_removed
+    # Winsorization (percentile clipping) instead of row deletion.
+    winsorized_columns: dict[str, dict[str, float | int]] = {}
+    for col in ["delay_min", "speed_normal"]:
+        if col not in cleaned.columns:
+            continue
+
+        series = cleaned[col]
+        p01 = float(series.quantile(0.01))
+        p99 = float(series.quantile(0.99))
+        before_clip = series.copy()
+        cleaned[col] = series.clip(lower=p01, upper=p99)
+
+        changed_count = int((before_clip != cleaned[col]).sum())
+        winsorized_columns[col] = {
+            "p01": round(p01, 6),
+            "p99": round(p99, 6),
+            "values_clipped": changed_count,
+        }
 
     print(f"Rows before cleaning: {before_rows}")
-    print(f"Rows after dropna+drop_duplicates: {after_rows}")
+    print(f"Rows after median-imputation+drop_duplicates: {after_rows}")
     print(f"Nulls before: {before_null}, nulls after: {after_null}")
-    print(f"Domain-filtered rows removed (total): {outlier_removed}")
-    print(f"  - delay_min <= -5 removed: {negative_delay_removed}")
-    print(f"  - speed_normal <= 0.05 removed: {low_speed_removed}")
+    print(f"Median-imputed columns: {median_imputed_cols if median_imputed_cols else 'None'}")
+    if iqr_outlier_counts_selected:
+        print("IQR outlier counts (selected columns):")
+        for col, count in iqr_outlier_counts_selected.items():
+            print(f"  - {col:25}: {count}")
+    if winsorized_columns:
+        print("Winsorization applied (1%-99% clipping):")
+        for col, info in winsorized_columns.items():
+            print(
+                f"  - {col:25}: clipped={info['values_clipped']}, "
+                f"p01={info['p01']}, p99={info['p99']}"
+            )
+    print("IQR row removal: disabled")
 
     summary = {
         "rows_before": before_rows,
-        "rows_after_dropna_dedup": after_rows,
+        "rows_after_impute_dedup": after_rows,
         "null_before": before_null,
         "null_after": after_null,
-        "domain_filtered_rows_removed": outlier_removed,
-        "negative_delay_removed": negative_delay_removed,
-        "low_speed_removed": low_speed_removed,
+        "median_imputed_columns": median_imputed_cols,
+        "iqr_outlier_counts_selected": iqr_outlier_counts_selected,
+        "iqr_outlier_rows_removed": 0,
+        "winsorized_columns": winsorized_columns,
         "rows_final": len(cleaned),
     }
     return cleaned, summary
@@ -440,7 +488,6 @@ def main() -> None:
     input_file = "traffic_dataset.csv"
     task = "regression"
     output_dir = "outputs"
-    keep_outliers = False
     scaling = "standard"
     outlier_min_unique = 10
 
@@ -460,13 +507,13 @@ def main() -> None:
     total_missing_after_fe = int(df_fe.isna().sum().sum())
     if total_missing_after_fe > 0:
         print(f"Missing values detected after feature engineering: {total_missing_after_fe}")
-        print("Missing rows will be handled by dropna() in clean_data.")
+        print("Missing values will be filled with median in clean_data.")
     else:
         print("No missing values detected before cleaning.")
 
     df_pre_clean = df_fe
 
-    df_clean, clean_summary = clean_data(df_pre_clean, remove_delay_outliers=(not keep_outliers))
+    df_clean, clean_summary = clean_data(df_pre_clean)
     df_encoded = encode_features(df_clean)
 
     duplicates_after_encoding = int(df_encoded.duplicated().sum())

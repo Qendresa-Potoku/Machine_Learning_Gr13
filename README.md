@@ -42,7 +42,8 @@ The pipeline is designed for machine learning preparation and supports:
 
 - dataset scope selection (full vs sampled)
 - feature engineering for temporal and route context
-- data cleaning and domain-based filtering
+- data cleaning with median imputation + deduplication
+- IQR outlier counting (reporting only) and percentile winsorization
 - encoding and scaling
 - skewness analysis with generated plots
 - IQR-based outlier analysis for continuous variables
@@ -110,8 +111,8 @@ Based on the pipeline typing groups, the core attributes are:
 ![Feature Engineering](ReadMe-Images/Feature%20Engineering.png)
 
 4. **Data Cleaning (clean_data)**
-- **Functionality:** Removes nulls, duplicates, and domain-invalid rows.
-- **Logic:** Drops missing rows (`dropna`), removes duplicates, and applies domain filters (`delay_min > -5`, `speed_normal > 0.05`).
+- **Functionality:** Handles missing values and duplicates while preserving rows.
+- **Logic:** Fills numeric nulls with median values, removes duplicates, reports selected-column IQR counts, and applies 1%-99% winsorization to `delay_min` and `speed_normal`.
 
 ![Data Cleaning](ReadMe-Images/Data%20Cleaning.png)
 
@@ -216,22 +217,32 @@ From the latest generated report in [outputs/cleaned_report_regression.json](out
 - Target: `delay_min`
 - Run mode: full dataset
 - Original shape: 32,070 rows x 13 columns
-- Processed shape: 26,926 rows x 56 columns
+- Processed shape: 32,070 rows x 63 columns
 
 ### Cleaning Summary
 
-- Rows after `dropna + drop_duplicates`: 32,050
-- Domain-filtered rows removed: 5,124
-  - `delay_min <= -5`: 726
-  - `speed_normal <= 0.05`: 4,398
+- Rows before cleaning: 32,070
+- Rows after median-imputation + deduplication: 32,070
+- Nulls handled by median imputation: 60 -> 0
+- Median-imputed columns: `temperature`, `wind`, `rain`
+- IQR outlier row removal: disabled (`0` rows removed)
+- Winsorization (1%-99%) applied to:
+  - `delay_min`: `p01=-5.55`, `p99=9.9062`, clipped values = `641`
+  - `speed_normal`: `p01=0.0`, `p99=0.768678`, clipped values = `106`
+
+Selected-column IQR outlier counts (reporting only):
+- `delay_min`: 4,328
+- `speed_normal`: 6,270
+- `distance_km`: 2,046
+- `duration_normal_min`: 755
 
 ### Skewness Highlights
 
 Most skewed continuous features (absolute skewness):
-- `distance_km`: 3.1573
-- `speed_normal`: 1.9298
-- `delay_min`: 1.3974
-- `duration_normal_min`: 1.2831
+- `distance_km`: 2.7787
+- `delay_min`: 1.1848
+- `wind`: 0.7558
+- `duration_normal_min`: 0.5822
 
 Generated plots:
 
@@ -264,7 +275,7 @@ Generated plots:
 
 - The project demonstrates a complete preprocessing workflow from raw traffic logs to ML-ready features.
 - Feature engineering includes temporal, route-based, weather-aware, and cyclic transformations.
-- Domain filtering and outlier analysis improve dataset reliability before modeling.
+- Outlier handling is non-destructive: IQR is used for analysis/reporting, while winsorization caps extreme values in selected columns.
 - The pipeline is modular and can be extended for both regression and classification tasks.
 - Auto-generated report and plots make results reproducible and easy to inspect.
 
