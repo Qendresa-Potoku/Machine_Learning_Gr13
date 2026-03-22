@@ -251,6 +251,7 @@ def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
         "destination",    # Not needed after creating route
         "route",          # Drop after one-hot encoding
         "hour",           # Not needed after sin/cos encoding
+        "rain",           # Dropped after creating is_bad_weather (constant/no-signal in current data)
         "duration_traffic_min",  # IMPORTANT: Remove to prevent data leakage
     ]
 
@@ -492,6 +493,32 @@ def main() -> None:
     df_final = drop_unused_columns(df_encoded)
     df_final, target_col = create_target(df_final, task)
 
+    print_section("FINAL ML READINESS CLEANUP")
+    rows_before_final_cleanup = len(df_final)
+
+    final_duplicates_removed = int(df_final.duplicated().sum())
+    if final_duplicates_removed > 0:
+        df_final = df_final.drop_duplicates().reset_index(drop=True)
+
+    zero_variance_cols = [
+        col for col in df_final.columns
+        if col != target_col and df_final[col].nunique(dropna=False) <= 1
+    ]
+    if zero_variance_cols:
+        df_final = df_final.drop(columns=zero_variance_cols)
+
+    rows_after_final_cleanup = len(df_final)
+    print(f"Final duplicates removed: {final_duplicates_removed}")
+    print(f"Zero-variance columns dropped: {zero_variance_cols if zero_variance_cols else 'None'}")
+    print(f"Rows before/after final cleanup: {rows_before_final_cleanup} -> {rows_after_final_cleanup}")
+
+    final_cleanup_summary = {
+        "rows_before": int(rows_before_final_cleanup),
+        "rows_after": int(rows_after_final_cleanup),
+        "duplicates_removed": int(final_duplicates_removed),
+        "zero_variance_columns_dropped": zero_variance_cols,
+    }
+
     outlier_input_df = df_final.copy()
 
 
@@ -529,6 +556,7 @@ def main() -> None:
             "final": completeness_final,
         },
         "cleaning": clean_summary,
+        "final_cleanup": final_cleanup_summary,
         "quality": quality_summary,
         "skewness": skewness_summary,
         "outliers_iqr": outlier_summary,

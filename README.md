@@ -48,8 +48,9 @@ The pipeline is designed for machine learning preparation and supports:
 - dataset scope selection (full vs sampled)
 - feature engineering for temporal and route context
 - data cleaning with median imputation + deduplication
+- final ML-readiness cleanup (drop post-pruning duplicates and zero-variance columns)
 - IQR outlier counting (reporting only) and percentile winsorization
-- encoding and scaling
+- encoding and feature pruning
 - skewness analysis with generated plots
 - IQR-based outlier analysis for continuous variables
 - export of cleaned dataset and JSON report
@@ -104,7 +105,7 @@ This project implements a comprehensive data processing workflow consisting of m
 |---|---|---|---|---|
 | 1 | Data Loading & Scope | Initialize dataset for analysis | - Load traffic CSV<br>- Select scope (Full vs Sampled)<br>- Parse dates | `data_analysis.py` |
 | 2 | Feature Engineering | Create model-ready features | - Temporal extras (Hour, Day)<br>- Rush hour detection (7-10 AM, 4-6 PM)<br>- Route encoding<br>- Cyclic time features | `data_analysis.py` |
-| 3 | Data Cleaning | Improve data quality | - Median imputation<br>- Deduplication<br>- Winsorization (1-99%) | `data_analysis.py` |
+| 3 | Data Cleaning | Improve data quality | - Median imputation<br>- Deduplication<br>- Winsorization (1-99%)<br>- Final duplicate cleanup after pruning | `data_analysis.py` |
 | 4 | Analysis & Visualization | Generate insights | - Skewness ranking<br>- Outlier detection (IQR)<br>- Traffic trend plots | `skewness_utils.py`<br>`visualizations.py` |
 | 5 | Export | Save final artifacts | - Save cleaned CSV<br>- Generate JSON report | `data_analysis.py` |
 
@@ -188,8 +189,8 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 ![Feature Engineering](ReadMe-Images/Feature%20Engineering.png)
 
 4. **Data Cleaning (clean_data)**
-- **Functionality:** Handles missing values and duplicates while preserving rows.
-- **Logic:** Fills numeric nulls with median values, removes duplicates, reports selected-column IQR counts, and applies 1%-99% winsorization to `delay_min` and `speed_normal`.
+- **Functionality:** Handles missing values and prepares robust numeric features.
+- **Logic:** Fills numeric nulls with median values, reports selected-column IQR counts, and applies 1%-99% winsorization to `delay_min` and `speed_normal`.
 
 ![Data Cleaning](ReadMe-Images/Data%20Cleaning.png)
 
@@ -201,7 +202,7 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 6. **Column Pruning (drop_unused_columns)**
 - **Functionality:** Drops raw, non-model columns and leakage-prone fields.
-- **Logic:** Removes timestamp, origin, destination, route, hour, and duration_traffic_min.
+- **Logic:** Removes timestamp, origin, destination, route, hour, rain, and duration_traffic_min.
 
 ![Column Pruning](ReadMe-Images/Column%20Pruning.png)
 
@@ -321,7 +322,7 @@ From the latest generated report in [outputs/cleaned_report_regression.json](out
 - Target: `delay_min`
 - Run mode: full dataset
 - Original shape: 32,070 rows x 13 columns
-- Processed shape: 32,070 rows x 63 columns
+- Processed shape: 26,347 rows x 62 columns
 
 ### Cleaning Summary
 
@@ -329,6 +330,9 @@ From the latest generated report in [outputs/cleaned_report_regression.json](out
 - Rows after median-imputation + deduplication: 32,070
 - Nulls handled by median imputation: 60 -> 0
 - Median-imputed columns: `temperature`, `wind`, `rain`
+- Final duplicates removed after pruning/target prep: 5,723
+- Final duplicate rows remaining: 0
+- Final dropped raw feature: `rain`
 - IQR outlier row removal: disabled (`0` rows removed)
 - Winsorization (1%-99%) applied to:
   - `delay_min`: `p01=-5.55`, `p99=9.9062`, clipped values = `641`
@@ -343,10 +347,10 @@ Selected-column IQR outlier counts (reporting only):
 ### Skewness Highlights
 
 Most skewed continuous features (absolute skewness):
-- `distance_km`: 2.7787
-- `delay_min`: 1.1848
-- `wind`: 0.7558
-- `duration_normal_min`: 0.5822
+- `distance_km`: 2.9059
+- `delay_min`: 1.0968
+- `duration_normal_min`: 0.8704
+- `wind`: 0.6888
 
 Generated plots:
 

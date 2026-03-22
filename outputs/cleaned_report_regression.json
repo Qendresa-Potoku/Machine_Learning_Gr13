@@ -3,8 +3,8 @@
   "input_file": "traffic_dataset.csv",
   "target_col": "delay_min",
   "shape_final": [
-    32070,
-    63
+    26347,
+    62
   ],
   "type_groups": {
     "numeric": [
@@ -70,10 +70,10 @@
       }
     },
     "final": {
-      "rows": 32070,
-      "columns": 63,
-      "total_cells": 2020410,
-      "complete_cells": 2020410,
+      "rows": 26347,
+      "columns": 62,
+      "total_cells": 1633514,
+      "complete_cells": 1633514,
       "null_cells": 0,
       "column_nulls": {
         "distance_km": 0,
@@ -83,7 +83,6 @@
         "is_weekend": 0,
         "temperature": 0,
         "wind": 0,
-        "rain": 0,
         "is_rush_hour": 0,
         "is_bad_weather": 0,
         "speed_normal": 0,
@@ -148,7 +147,6 @@
         "is_weekend": 100.0,
         "temperature": 100.0,
         "wind": 100.0,
-        "rain": 100.0,
         "is_rush_hour": 100.0,
         "is_bad_weather": 100.0,
         "speed_normal": 100.0,
@@ -238,9 +236,15 @@
     },
     "rows_final": 32070
   },
+  "final_cleanup": {
+    "rows_before": 32070,
+    "rows_after": 26347,
+    "duplicates_removed": 5723,
+    "zero_variance_columns_dropped": []
+  },
   "quality": {
     "total_missing": 0,
-    "duplicate_rows": 5723,
+    "duplicate_rows": 0,
     "quality_score": 100.0
   },
   "skewness": {
@@ -248,32 +252,32 @@
     "plotted_columns": [
       "distance_km",
       "delay_min",
-      "wind",
       "duration_normal_min",
+      "wind",
+      "speed_normal",
       "hour_sin",
       "temperature",
-      "hour_cos",
-      "speed_normal"
+      "hour_cos"
     ],
     "skewness": {
-      "distance_km": 2.7787,
-      "delay_min": 1.1848,
-      "wind": 0.7558,
-      "duration_normal_min": 0.5822,
-      "hour_sin": 0.4439,
-      "temperature": -0.3481,
-      "hour_cos": 0.1298,
-      "speed_normal": 0.0084
+      "distance_km": 2.9059,
+      "delay_min": 1.0968,
+      "duration_normal_min": 0.8704,
+      "wind": 0.6888,
+      "speed_normal": 0.5626,
+      "hour_sin": 0.5431,
+      "temperature": -0.4285,
+      "hour_cos": 0.2563
     },
     "outlier_counts_iqr": {
-      "distance_km": 2046,
-      "delay_min": 4328,
-      "wind": 2447,
-      "duration_normal_min": 755,
+      "distance_km": 2002,
+      "delay_min": 2110,
+      "duration_normal_min": 922,
+      "wind": 2089,
+      "speed_normal": 3057,
       "hour_sin": 0,
       "temperature": 0,
-      "hour_cos": 0,
-      "speed_normal": 6270
+      "hour_cos": 0
     }
   },
   "outliers_iqr": {
@@ -299,11 +303,11 @@
       "hour_cos"
     ],
     "outlier_counts": {
-      "distance_km": 2046,
-      "duration_normal_min": 755,
+      "distance_km": 2002,
+      "duration_normal_min": 922,
       "temperature": 0,
-      "wind": 2447,
-      "speed_normal": 6270,
+      "wind": 2089,
+      "speed_normal": 3057,
       "hour_sin": 0,
       "hour_cos": 0
     },
@@ -311,7 +315,6 @@
       "delay_min": "excluded_by_name",
       "day_of_week": "excluded_by_name",
       "is_weekend": "excluded_by_name",
-      "rain": "excluded_by_name",
       "is_rush_hour": "excluded_by_name",
       "is_bad_weather": "excluded_by_name",
       "route_Albi Mall, Prishtine, Kosovo → Veternik, Prishtine, Kosovo": "excluded_by_prefix",
@@ -376,8 +379,8 @@
       13
     ],
     "processed_shape": [
-      32070,
-      63
+      26347,
+      62
     ],
     "processed_columns": [
       "distance_km",
@@ -387,7 +390,6 @@
       "is_weekend",
       "temperature",
       "wind",
-      "rain",
       "is_rush_hour",
       "is_bad_weather",
       "speed_normal",
