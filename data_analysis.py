@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from math import pi, sin, cos
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from skewness_utils import analyze_skewness_with_graphics
 
 
@@ -164,6 +165,38 @@ def create_target(df: pd.DataFrame, task: str) -> tuple[pd.DataFrame, str]:
 
     raise ValueError("Task must be one of: regression or classification")
 
+def normalize_features(df: pd.DataFrame, target_col: str, method: str = "standard") -> pd.DataFrame:
+    print_section("6) NORMALIZATION")
+
+    out = df.copy()
+
+    # Merr vetëm kolonat numerike
+    numeric_cols = out.select_dtypes(include=[np.number]).columns.tolist()
+
+    # Mos përfshi targetin
+    numeric_cols = [col for col in numeric_cols if col != target_col]
+
+    print(f"Columns to normalize: {numeric_cols}")
+
+    if not numeric_cols:
+        print("No numeric columns found for normalization.")
+        return out
+
+    # Zgjedh metodën
+    if method == "standard":
+        scaler = StandardScaler()
+    elif method == "minmax":
+        scaler = MinMaxScaler()
+    else:
+        print("No normalization applied.")
+        return out
+
+    # Apliko scaling
+    out[numeric_cols] = scaler.fit_transform(out[numeric_cols])
+
+    print(f"Normalization applied using: {method}")
+    return out
+
 
 def encode_features(df: pd.DataFrame) -> pd.DataFrame:
     """Apply one-hot encoding to categorical features."""
@@ -313,6 +346,12 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="If set, delay_min outliers are kept",
     )
+    parser.add_argument(
+    "--scaling",
+    default="standard",
+    choices=["standard", "minmax", "none"],
+    help="Scaling method for normalization",
+    )
     return parser.parse_args()
 
 
@@ -339,6 +378,10 @@ def main() -> None:
 
     df_final = drop_unused_columns(df_encoded)
     df_final, target_col = create_target(df_final, args.task)
+
+    if args.scaling != "none":
+        df_final = normalize_features(df_final, target_col, method=args.scaling)
+
     quality_summary = analyze_data_quality(df_final)
     skewness_summary = analyze_skewness_with_graphics(df_final, Path(args.output_dir))
     terminal_summary = print_full_terminal_report(df, df_final, target_col, args.task)
