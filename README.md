@@ -96,29 +96,43 @@ Based on the pipeline typing groups, the core attributes are:
 - **Functionality:** Lets the user choose full-dataset processing or sampled processing.
 - **Logic:** Uses interactive input and reproducible random sampling when sample mode is selected.
 
+![Dataset Scope Selection](ReadMe-Images/Dataset%20Scope%20Selection.png)
+
 2. **Data Type Analysis (analyze_data_types)**
 - **Functionality:** Checks expected feature groups (numeric, categorical, temporal, binary, discrete).
 - **Logic:** Verifies column presence per group and prints dtype diagnostics for each column.
+
+![Data Type Analysis](ReadMe-Images/Data%20Type%20Analysis.png)
 
 3. **Feature Engineering (feature_engineering)**
 - **Functionality:** Creates additional features for time, weather, route context, and cyclic hour encoding.
 - **Logic:** Derives hour, day_of_week, is_weekend, route, is_rush_hour, is_bad_weather, speed_normal, hour_sin, and hour_cos.
 
+![Feature Engineering](ReadMe-Images/Feature%20Engineering.png)
+
 4. **Missing Value Strategy (suggest_missing_value_strategy, apply_missing_value_strategy)**
 - **Functionality:** Suggests and optionally applies column-wise missing-value handling rules.
 - **Logic:** Chooses median, mode, fill, or drop actions based on dtype and null ratio.
+
+![Missing Value Strategy](ReadMe-Images/Missing%20Value%20Strategy.png)
 
 5. **Data Cleaning (clean_data)**
 - **Functionality:** Removes nulls, duplicates, and domain-invalid rows.
 - **Logic:** Applies filtering rules including delay_min > -5 and speed_normal > 0.05.
 
+![Data Cleaning](ReadMe-Images/Data%20Cleaning.png)
+
 6. **Categorical Encoding (encode_features)**
 - **Functionality:** Converts route text into model-ready binary indicators.
 - **Logic:** Uses one-hot encoding via pd.get_dummies for the route feature.
 
+![Categorical Encoding](ReadMe-Images/Categorical%20Encoding.png)
+
 7. **Column Pruning (drop_unused_columns)**
 - **Functionality:** Drops raw, non-model columns and leakage-prone fields.
 - **Logic:** Removes timestamp, origin, destination, route, hour, and duration_traffic_min.
+
+![Column Pruning](ReadMe-Images/Column%20Pruning.png)
 
 8. **Target Creation (create_target)**
 - **Functionality:** Defines the prediction target based on selected ML task.
@@ -253,6 +267,7 @@ Generated plots:
 ---
 
 ## License
+
 
 
 
