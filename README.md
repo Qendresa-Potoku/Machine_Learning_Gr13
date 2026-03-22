@@ -1,4 +1,4 @@
-# Traffic Dataset Preprocessing Pipeline
+﻿# Traffic Dataset Preprocessing Pipeline
 
 <table>
   <tr>
@@ -6,14 +6,14 @@
       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/University_of_Prishtina_logo.svg/1200px-University_of_Prishtina_logo.svg.png" width="120" alt="University Logo" />
     </td>
     <td valign="top">
-      <p><strong>Universiteti i Prishtinës</strong></p>
-      <p>Fakulteti i Inxhinierisë Elektrike dhe Kompjuterike</p>
+      <p><strong>Universiteti i PrishtinÃ«s</strong></p>
+      <p>Fakulteti i InxhinierisÃ« Elektrike dhe Kompjuterike</p>
       <p>Inxhinieri Kompjuterike dhe Softuerike - Programi Master</p>
-      <p><strong>Projekti nga lënda:</strong> Machine Learning</p>
-      <p><strong>Studentët (Gr. 13):</strong></p>
+      <p><strong>Projekti nga lÃ«nda:</strong> Machine Learning</p>
+      <p><strong>StudentÃ«t (Gr. 13):</strong></p>
       <ul>
         <li>Olta Pllana</li>
-        <li>Qëndresa Potoku</li>
+        <li>QÃ«ndresa Potoku</li>
         <li>Besarta Berisha</li>
       </ul>
     </td>
@@ -213,11 +213,27 @@ Most skewed continuous features (absolute skewness):
 - `duration_normal_min`: 1.2915
 - `delay_min`: 1.2659
 
-Generated plots include:
-- [outputs/skewness_plots/distance_km.png](outputs/skewness_plots/distance_km.png)
-- [outputs/skewness_plots/speed_normal.png](outputs/skewness_plots/speed_normal.png)
-- [outputs/skewness_plots/delay_min.png](outputs/skewness_plots/delay_min.png)
-- [outputs/skewness_plots/temperature.png](outputs/skewness_plots/temperature.png)
+Generated plots:
+
+| **Distance KM Distribution** | **Speed Normal Distribution** |
+| :---: | :---: |
+| ![Distance KM Distribution and Outliers](outputs/skewness_plots/distance_km.png) | ![Speed Normal Distribution and Outliers](outputs/skewness_plots/speed_normal.png) |
+| *Figure 1: Histogram and boxplot for distance_km.* | *Figure 2: Histogram and boxplot for speed_normal.* |
+
+| **Delay Distribution** | **Duration Normal Distribution** |
+| :---: | :---: |
+| ![Delay Distribution and Outliers](outputs/skewness_plots/delay_min.png) | ![Duration Normal Distribution and Outliers](outputs/skewness_plots/duration_normal_min.png) |
+| *Figure 3: Histogram and boxplot for delay_min.* | *Figure 4: Histogram and boxplot for duration_normal_min.* |
+
+| **Temperature Distribution** | **Wind Distribution** |
+| :---: | :---: |
+| ![Temperature Distribution and Outliers](outputs/skewness_plots/temperature.png) | ![Wind Distribution and Outliers](outputs/skewness_plots/wind.png) |
+| *Figure 5: Histogram and boxplot for temperature.* | *Figure 6: Histogram and boxplot for wind.* |
+
+| **Hour Sin Distribution** | **Hour Cos Distribution** |
+| :---: | :---: |
+| ![Hour Sin Distribution and Outliers](outputs/skewness_plots/hour_sin.png) | ![Hour Cos Distribution and Outliers](outputs/skewness_plots/hour_cos.png) |
+| *Figure 7: Histogram and boxplot for hour_sin.* | *Figure 8: Histogram and boxplot for hour_cos.* |
 
 ### Output Files
 
@@ -236,4 +252,4 @@ Generated plots include:
 
 ## License
 
-This repository follows the license in [LICENSE](LICENSE) if provided in the project.
+
