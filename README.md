@@ -52,7 +52,6 @@ The pipeline is designed for machine learning preparation and supports:
 - IQR outlier counting (reporting only) and percentile winsorization
 - encoding and feature pruning
 - skewness analysis with generated plots
-- IQR-based outlier analysis for continuous variables
 - export of cleaned dataset and JSON report
 
 The current run configuration in [data_analysis.py](data_analysis.py) uses the regression task with `delay_min` as target and exports results to [outputs/](outputs/).
@@ -106,7 +105,7 @@ This project implements a comprehensive data processing workflow consisting of m
 | 1 | Data Loading & Scope | Initialize dataset for analysis | - Load traffic CSV<br>- Select scope (Full vs Sampled)<br>- Parse dates | `data_analysis.py` |
 | 2 | Feature Engineering | Create model-ready features | - Temporal extras (Hour, Day)<br>- Rush hour detection (7-10 AM, 4-6 PM)<br>- Route encoding<br>- Cyclic time features | `data_analysis.py` |
 | 3 | Data Cleaning | Improve data quality | - Median imputation<br>- Deduplication<br>- Winsorization (1-99%)<br>- Final duplicate cleanup after pruning | `data_analysis.py` |
-| 4 | Analysis & Visualization | Generate insights | - Skewness ranking<br>- Outlier detection (IQR)<br>- Traffic trend plots | `skewness_utils.py`<br>`visualizations.py` |
+| 4 | Analysis & Visualization | Generate insights | - Skewness ranking<br>- Traffic trend plots | `skewness_utils.py`<br>`visualizations.py` |
 | 5 | Export | Save final artifacts | - Save cleaned CSV<br>- Generate JSON report | `data_analysis.py` |
 
 ### Target Definition
@@ -218,17 +217,11 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Quality and Completeness](ReadMe-Images/Quality%20and%20Completeness.png)
 
-9. **Outlier Detection (detect_outliers_iqr)**
-- **Functionality:** Measures outlier counts for continuous features.
-- **Logic:** Uses IQR bounds with exclusion rules for encoded, binary, and low-cardinality columns.
-
-![Outlier Detection](ReadMe-Images/Outlier.png)
-
-10. **Terminal Report (print_full_terminal_report)**
+9. **Terminal Report (print_full_terminal_report)**
 - **Functionality:** Generates a full end-of-pipeline textual summary.
 - **Logic:** Prints shape changes, memory usage, numeric summaries, and target distribution.
 
-11. **Output Export (save_outputs)**
+10. **Output Export (save_outputs)**
 - **Functionality:** Saves final artifacts for downstream work.
 - **Logic:** Writes cleaned dataset CSV and structured JSON report into outputs.
 

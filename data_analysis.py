@@ -307,76 +307,6 @@ def profile_completeness(df: pd.DataFrame, label: str = "dataset") -> dict:
     }
 
 
-def detect_outliers_iqr(
-    df: pd.DataFrame,
-    min_unique_for_continuous: int = 10,
-    exclude_prefixes: tuple[str, ...] = ("route_",),
-    exclude_columns: set[str] | None = None,
-    exclude_keywords: tuple[str, ...] = ("_bin", "_flag", "_encoded"),
-) -> dict[str, Any]:
-    print_section("OUTLIER DETECTION")
-
-    outlier_counts: dict[str, int] = {}
-    skipped_columns: dict[str, str] = {}
-    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-    excluded = exclude_columns or set()
-
-    for col in numeric_cols:
-        if col in excluded:
-            skipped_columns[col] = "excluded_by_name"
-            continue
-        if any(col.startswith(prefix) for prefix in exclude_prefixes):
-            skipped_columns[col] = "excluded_by_prefix"
-            continue
-        if any(keyword in col for keyword in exclude_keywords):
-            skipped_columns[col] = "excluded_by_keyword"
-            continue
-
-        series = df[col].dropna()
-        if series.empty:
-            outlier_counts[col] = 0
-            continue
-
-        if series.nunique(dropna=True) <= min_unique_for_continuous:
-            skipped_columns[col] = "low_cardinality"
-            continue
-
-        q1 = series.quantile(0.25)
-        q3 = series.quantile(0.75)
-        iqr = q3 - q1
-
-        if iqr == 0:
-            skipped_columns[col] = "zero_iqr"
-            continue
-
-        low = q1 - 1.5 * iqr
-        high = q3 + 1.5 * iqr
-        outlier_counts[col] = int(((series < low) | (series > high)).sum())
-
-    if outlier_counts:
-        print("Continuous columns analyzed:")
-        for col, count in outlier_counts.items():
-            print(f"  - {col:25}: {count}")
-    else:
-        print("No continuous numeric columns qualified for IQR outlier analysis.")
-
-    if skipped_columns:
-        print(f"Skipped columns: {len(skipped_columns)}")
-
-    return {
-        "method": "iqr",
-        "iqr_multiplier": 1.5,
-        "min_unique_for_continuous": int(min_unique_for_continuous),
-        "exclude_prefixes": list(exclude_prefixes),
-        "exclude_keywords": list(exclude_keywords),
-        "analyzed_column_count": len(outlier_counts),
-        "analyzed_columns": list(outlier_counts.keys()),
-        "outlier_counts": outlier_counts,
-        "skipped_columns": skipped_columns,
-    }
-
-
-
 def print_full_terminal_report(original_df: pd.DataFrame, final_df: pd.DataFrame, target_col: str, task: str) -> dict:
     print_section("7) FULL TERMINAL REPORT")
 
@@ -449,7 +379,6 @@ def main() -> None:
     task = "regression"
     output_dir = "outputs"
     scaling = "standard"
-    outlier_min_unique = 10
 
     print_section("PREPROCESSING")
     print(f"Input: {input_file}")
@@ -514,27 +443,9 @@ def main() -> None:
         "zero_variance_columns_dropped": zero_variance_cols,
     }
 
-    outlier_input_df = df_final.copy()
-
-
     completeness_final = profile_completeness(df_final, label="final")
     quality_summary = analyze_data_quality(df_final)
     skewness_summary = analyze_skewness_with_graphics(df_final, Path(output_dir))
-    outlier_exclude_cols = {
-        target_col,
-        "day_of_week",
-        "is_weekend",
-        "rain",
-        "is_rush_hour",
-        "is_bad_weather",
-    }
-    outlier_summary = detect_outliers_iqr(
-        outlier_input_df,
-        min_unique_for_continuous=outlier_min_unique,
-        exclude_prefixes=("route_",),
-        exclude_columns=outlier_exclude_cols,
-        exclude_keywords=("_bin", "_flag", "_encoded"),
-    )
 
     sampling_summary: dict[str, Any] = {"method": "none", "note": "Dataset scope chosen interactively at start"}
 
@@ -554,7 +465,6 @@ def main() -> None:
         "final_cleanup": final_cleanup_summary,
         "quality": quality_summary,
         "skewness": skewness_summary,
-        "outliers_iqr": outlier_summary,
         "sampling": sampling_summary,
         "terminal_summary": terminal_summary,
         "created_features": [
