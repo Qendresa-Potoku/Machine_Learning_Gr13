@@ -217,9 +217,7 @@
     ],
     "iqr_outlier_counts_selected": {
       "delay_min": 4328,
-      "speed_normal": 6270,
-      "distance_km": 2046,
-      "duration_normal_min": 755
+      "speed_normal": 6270
     },
     "iqr_outlier_rows_removed": 0,
     "winsorized_columns": {

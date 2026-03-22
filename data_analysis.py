@@ -126,8 +126,6 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     columns_to_check_iqr = [
         "delay_min",
         "speed_normal",
-        "distance_km",
-        "duration_normal_min",
     ]
 
     iqr_outlier_counts_selected: dict[str, int] = {}
@@ -167,8 +165,6 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
             "values_clipped": changed_count,
         }
 
-    print(f"Rows before cleaning: {before_rows}")
-    print(f"Rows after median-imputation+drop_duplicates: {after_rows}")
     print(f"Nulls before: {before_null}, nulls after: {after_null}")
     print(f"Median-imputed columns: {median_imputed_cols if median_imputed_cols else 'None'}")
     if iqr_outlier_counts_selected:
@@ -182,7 +178,6 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
                 f"  - {col:25}: clipped={info['values_clipped']}, "
                 f"p01={info['p01']}, p99={info['p99']}"
             )
-    print("IQR row removal: disabled")
 
     summary = {
         "rows_before": before_rows,
