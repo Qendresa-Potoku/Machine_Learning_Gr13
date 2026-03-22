@@ -1,6 +1,6 @@
-import argparse
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -13,6 +13,27 @@ def print_section(title: str) -> None:
     print("\n" + "=" * 60)
     print(title)
     print("=" * 60)
+
+
+def choose_dataset_scope(df: pd.DataFrame, sample_n: int = 5000) -> pd.DataFrame:
+    print_section("DATASET SCOPE SELECTION")
+    print(f"\nOptions:")
+    print(f"  [1] Process FULL dataset ({len(df):,} rows)")
+    print(f"  [2] Process SAMPLE ({min(sample_n, len(df)):,} rows)")
+    
+    while True:
+        choice = input("\nEnter choice [1/2] (default: 2 - sample): ").strip().lower()
+        
+        if choice in ["1", "full", "f"]:
+            print(f"\n>> Processing full dataset: {len(df):,} rows")
+            return df
+        elif choice in ["2", "sample", "s", ""]:
+            n = min(sample_n, len(df))
+            sampled = df.sample(n=n, random_state=42).reset_index(drop=True)
+            print(f"\n>> Processing sample: {n:,} rows (random)")
+            return sampled
+        else:
+            print("Invalid choice. Please enter '1' (full) or '2' (sample).")
 
 
 def analyze_data_types(df: pd.DataFrame) -> dict:
@@ -52,33 +73,27 @@ def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
     print_section("2) FEATURE ENGINEERING")
     out = df.copy()
 
-    # Temporal features (no data leakage)
     if "timestamp" in out.columns:
         out["timestamp"] = pd.to_datetime(out["timestamp"], errors="coerce")
         out["hour"] = out["timestamp"].dt.hour
         out["day_of_week"] = out["timestamp"].dt.dayofweek
         out["is_weekend"] = out["day_of_week"].isin([5, 6]).astype(int)
 
-    # Route feature: concatenate origin and destination
     if {"origin", "destination"}.issubset(out.columns):
         out["route"] = out["origin"].astype(str) + " → " + out["destination"].astype(str)
 
-    # Rush hour feature (hours 7-9 and 16-18)
     if "hour" in out.columns:
         out["is_rush_hour"] = (
             (out["hour"].isin(range(7, 10))) | (out["hour"].isin(range(16, 19)))
         ).astype(int)
 
-    # Bad weather feature
     if {"rain", "wind"}.issubset(out.columns):
         out["is_bad_weather"] = ((out["rain"] > 0) | (out["wind"] > 8)).astype(int)
 
-    # Speed normal: distance / duration_normal_min (no leakage, only uses normal duration)
     if {"distance_km", "duration_normal_min"}.issubset(out.columns):
         epsilon = 1e-5
         out["speed_normal"] = out["distance_km"] / (out["duration_normal_min"] + epsilon)
 
-    # Cyclic encoding for hour
     if "hour" in out.columns:
         out["hour_sin"] = np.sin(2 * pi * out["hour"] / 24)
         out["hour_cos"] = np.cos(2 * pi * out["hour"] / 24)
@@ -101,9 +116,6 @@ def clean_data(df: pd.DataFrame, remove_delay_outliers: bool = True) -> tuple[pd
     after_rows = len(cleaned)
     after_null = int(cleaned.isna().sum().sum())
 
-    # Domain-based filtering (real-world constraints), not statistical IQR filtering.
-    # We keep realistic heavy traffic behavior (large positive delays, long distances,
-    # and duration variation) and only remove impossible/noisy records.
     outlier_removed = 0
     negative_delay_removed = 0
     low_speed_removed = 0
@@ -170,11 +182,14 @@ def normalize_features(df: pd.DataFrame, target_col: str, method: str = "standar
 
     out = df.copy()
 
-    # Merr vetëm kolonat numerike
     numeric_cols = out.select_dtypes(include=[np.number]).columns.tolist()
 
-    # Mos përfshi targetin
     numeric_cols = [col for col in numeric_cols if col != target_col]
+    numeric_cols = [
+        col
+        for col in numeric_cols
+        if not col.startswith("route_") and out[col].nunique(dropna=True) > 2
+    ]
 
     print(f"Columns to normalize: {numeric_cols}")
 
@@ -182,7 +197,6 @@ def normalize_features(df: pd.DataFrame, target_col: str, method: str = "standar
         print("No numeric columns found for normalization.")
         return out
 
-    # Zgjedh metodën
     if method == "standard":
         scaler = StandardScaler()
     elif method == "minmax":
@@ -191,7 +205,6 @@ def normalize_features(df: pd.DataFrame, target_col: str, method: str = "standar
         print("No normalization applied.")
         return out
 
-    # Apliko scaling
     out[numeric_cols] = scaler.fit_transform(out[numeric_cols])
 
     print(f"Normalization applied using: {method}")
@@ -199,13 +212,16 @@ def normalize_features(df: pd.DataFrame, target_col: str, method: str = "standar
 
 
 def encode_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Apply one-hot encoding to categorical features."""
     print_section("ENCODE FEATURES")
     out = df.copy()
 
-    # One-hot encode route column
     if "route" in out.columns:
-        route_encoded = pd.get_dummies(out["route"], prefix="route", drop_first=True)
+        route_encoded = pd.get_dummies(
+            out["route"],
+            prefix="route",
+            drop_first=True,
+            dtype=np.int8,
+        )
         out = pd.concat([out, route_encoded], axis=1)
         print(f"Created {len(route_encoded.columns)} route encoding columns")
 
@@ -217,7 +233,6 @@ def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
     print_section("DROP UNUSED COLUMNS")
     out = df.copy()
 
-    # Columns to drop
     columns_to_drop = [
         "timestamp",      # Not needed after extracting temporal features
         "origin",         # Not needed after creating route
@@ -227,7 +242,6 @@ def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
         "duration_traffic_min",  # IMPORTANT: Remove to prevent data leakage
     ]
 
-    # Drop only columns that exist in the dataframe
     existing_to_drop = [col for col in columns_to_drop if col in out.columns]
     out = out.drop(columns=existing_to_drop)
 
@@ -261,6 +275,155 @@ def analyze_data_quality(df: pd.DataFrame) -> dict:
     }
 
 
+def profile_completeness(df: pd.DataFrame, label: str = "dataset") -> dict:
+    print_section(f"COMPLETENESS PROFILE ({label.upper()})")
+
+    rows, cols = df.shape
+    total_cells = rows * cols
+    total_null = int(df.isna().sum().sum())
+    total_complete = int(total_cells - total_null)
+
+    print(f"Rows: {rows}, Columns: {cols}")
+    print(f"Total cells: {total_cells}")
+    print(f"Complete cells: {total_complete}")
+    print(f"Null cells: {total_null}")
+
+    return {
+        "rows": rows,
+        "columns": cols,
+        "total_cells": total_cells,
+        "complete_cells": total_complete,
+        "null_cells": total_null,
+        "column_nulls": {k: int(v) for k, v in df.isna().sum().to_dict().items()},
+        "column_completeness_pct": ((1 - df.isna().mean()) * 100).round(2).to_dict(),
+    }
+
+
+def suggest_missing_value_strategy(df: pd.DataFrame) -> dict[str, str]:
+    print_section("MISSING VALUE STRATEGY")
+
+    strategy: dict[str, str] = {}
+    for col in df.columns:
+        null_ratio = float(df[col].isna().mean())
+        if null_ratio == 0:
+            strategy[col] = "-"
+            continue
+
+        if null_ratio > 0.4:
+            strategy[col] = "drop_column_or_domain_review"
+            continue
+
+        if pd.api.types.is_numeric_dtype(df[col]):
+            strategy[col] = "median_imputation"
+        elif pd.api.types.is_datetime64_any_dtype(df[col]):
+            strategy[col] = "forward_fill_then_backward_fill"
+        else:
+            strategy[col] = "mode_imputation"
+
+    for col, action in strategy.items():
+        print(f"  - {col:25}: {action}")
+
+    return strategy
+
+
+def apply_missing_value_strategy(df: pd.DataFrame, strategy: dict[str, str]) -> pd.DataFrame:
+    print_section("APPLY MISSING VALUE STRATEGY")
+    out = df.copy()
+
+    for col, action in strategy.items():
+        if col not in out.columns:
+            continue
+
+        if action == "-":
+            continue
+        if action == "drop_column_or_domain_review":
+            out = out.drop(columns=[col])
+            continue
+        if action == "median_imputation" and pd.api.types.is_numeric_dtype(out[col]):
+            out[col] = out[col].fillna(out[col].median())
+            continue
+        if action == "mode_imputation":
+            mode_vals = out[col].mode(dropna=True)
+            if not mode_vals.empty:
+                out[col] = out[col].fillna(mode_vals.iloc[0])
+            continue
+        if action == "forward_fill_then_backward_fill":
+            out[col] = out[col].ffill().bfill()
+
+    print("Missing value strategy applied.")
+    return out
+
+
+def detect_outliers_iqr(
+    df: pd.DataFrame,
+    min_unique_for_continuous: int = 10,
+    exclude_prefixes: tuple[str, ...] = ("route_",),
+    exclude_columns: set[str] | None = None,
+    exclude_keywords: tuple[str, ...] = ("_bin", "_flag", "_encoded"),
+) -> dict[str, Any]:
+    print_section("OUTLIER DETECTION")
+
+    outlier_counts: dict[str, int] = {}
+    skipped_columns: dict[str, str] = {}
+    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    excluded = exclude_columns or set()
+
+    for col in numeric_cols:
+        if col in excluded:
+            skipped_columns[col] = "excluded_by_name"
+            continue
+        if any(col.startswith(prefix) for prefix in exclude_prefixes):
+            skipped_columns[col] = "excluded_by_prefix"
+            continue
+        if any(keyword in col for keyword in exclude_keywords):
+            skipped_columns[col] = "excluded_by_keyword"
+            continue
+
+        series = df[col].dropna()
+        if series.empty:
+            outlier_counts[col] = 0
+            continue
+
+        if series.nunique(dropna=True) <= min_unique_for_continuous:
+            skipped_columns[col] = "low_cardinality"
+            continue
+
+        q1 = series.quantile(0.25)
+        q3 = series.quantile(0.75)
+        iqr = q3 - q1
+
+        if iqr == 0:
+            skipped_columns[col] = "zero_iqr"
+            continue
+
+        low = q1 - 1.5 * iqr
+        high = q3 + 1.5 * iqr
+        outlier_counts[col] = int(((series < low) | (series > high)).sum())
+
+    if outlier_counts:
+        print("Continuous columns analyzed:")
+        for col, count in outlier_counts.items():
+            print(f"  - {col:25}: {count}")
+    else:
+        print("No continuous numeric columns qualified for IQR outlier analysis.")
+
+    if skipped_columns:
+        print(f"Skipped columns: {len(skipped_columns)}")
+
+    return {
+        "method": "iqr",
+        "iqr_multiplier": 1.5,
+        "min_unique_for_continuous": int(min_unique_for_continuous),
+        "exclude_prefixes": list(exclude_prefixes),
+        "exclude_keywords": list(exclude_keywords),
+        "analyzed_column_count": len(outlier_counts),
+        "analyzed_columns": list(outlier_counts.keys()),
+        "outlier_counts": outlier_counts,
+        "skipped_columns": skipped_columns,
+    }
+
+
+
 def print_full_terminal_report(original_df: pd.DataFrame, final_df: pd.DataFrame, target_col: str, task: str) -> dict:
     print_section("7) FULL TERMINAL REPORT")
 
@@ -284,16 +447,27 @@ def print_full_terminal_report(original_df: pd.DataFrame, final_df: pd.DataFrame
     for col, mem_mb in col_mem.items():
         print(f"  - {col:25}: {mem_mb:10.4f} MB")
 
-    numeric_cols = final_df.select_dtypes(include=[np.number]).columns
-    if len(numeric_cols) > 0:
-        print("\nNumeric column summary:")
-        print(final_df[numeric_cols].describe().to_string())
+    numeric_cols = final_df.select_dtypes(include=[np.number]).columns.tolist()
+    continuous_numeric_cols = [
+        col for col in numeric_cols if final_df[col].nunique(dropna=True) > 10 and not col.startswith("route_")
+    ]
+    if len(continuous_numeric_cols) > 0:
+        print("\nNumeric column summary (continuous features):")
+        print(final_df[continuous_numeric_cols].describe().to_string())
 
     categorical_cols = final_df.select_dtypes(exclude=[np.number]).columns
     if len(categorical_cols) > 0:
         print("\nCategorical column unique counts:")
         for col in categorical_cols:
             print(f"  - {col:25}: {final_df[col].nunique(dropna=False)} unique values")
+
+    indicator_cols = [
+        col
+        for col in numeric_cols
+        if final_df[col].nunique(dropna=True) <= 2
+    ]
+    if indicator_cols:
+        print(f"\nBinary/indicator numeric columns: {len(indicator_cols)}")
 
     if task == "classification" and target_col in final_df.columns:
         print("\nTarget class distribution:")
@@ -327,47 +501,39 @@ def save_outputs(df: pd.DataFrame, target_col: str, output_dir: Path, task: str,
     print(f"Target column: {target_col}")
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Phase 1 dataset preparation for ML")
-    parser.add_argument("--input", default="traffic_dataset.csv", help="Path to input CSV dataset")
-    parser.add_argument(
-        "--task",
-        default="regression",
-        choices=["regression", "classification"],
-        help="Target type: regression or classification",
-    )
-    parser.add_argument(
-        "--output-dir",
-        default="outputs",
-        help="Folder where prepared dataset and report are saved",
-    )
-    parser.add_argument(
-        "--keep-outliers",
-        action="store_true",
-        help="If set, delay_min outliers are kept",
-    )
-    parser.add_argument(
-    "--scaling",
-    default="standard",
-    choices=["standard", "minmax", "none"],
-    help="Scaling method for normalization",
-    )
-    return parser.parse_args()
+
 
 
 def main() -> None:
-    args = parse_args()
+    input_file = "traffic_dataset.csv"
+    task = "regression"
+    output_dir = "outputs"
+    keep_outliers = False
+    impute_missing = False
+    scaling = "standard"
+    outlier_min_unique = 10
 
     print_section("PREPROCESSING")
-    print(f"Input: {args.input}")
-    print(f"Task: {args.task}")
-    print(f"Output dir: {args.output_dir}")
+    print(f"Input: {input_file}")
+    print(f"Task: {task}")
+    print(f"Output dir: {output_dir}")
 
-    df = pd.read_csv(args.input)
+    df = pd.read_csv(input_file)
+    
+    df = choose_dataset_scope(df, sample_n=5000)
 
     type_groups = analyze_data_types(df)
+    completeness_original = profile_completeness(df, label="original")
+
     df_fe = feature_engineering(df)
-    df_clean, clean_summary = clean_data(df_fe, remove_delay_outliers=(not args.keep_outliers))
+    missing_strategy = suggest_missing_value_strategy(df_fe)
+
+    if impute_missing:
+        df_pre_clean = apply_missing_value_strategy(df_fe, missing_strategy)
+    else:
+        df_pre_clean = df_fe
+
+    df_clean, clean_summary = clean_data(df_pre_clean, remove_delay_outliers=(not keep_outliers))
     df_encoded = encode_features(df_clean)
 
     duplicates_after_encoding = int(df_encoded.duplicated().sum())
@@ -377,24 +543,52 @@ def main() -> None:
         print(f"Removed duplicates after encoding: {duplicates_after_encoding}")
 
     df_final = drop_unused_columns(df_encoded)
-    df_final, target_col = create_target(df_final, args.task)
+    df_final, target_col = create_target(df_final, task)
 
-    if args.scaling != "none":
-        df_final = normalize_features(df_final, target_col, method=args.scaling)
+    outlier_input_df = df_final.copy()
 
+    if scaling != "none":
+        df_final = normalize_features(df_final, target_col, method=scaling)
+
+    completeness_final = profile_completeness(df_final, label="final")
     quality_summary = analyze_data_quality(df_final)
-    skewness_summary = analyze_skewness_with_graphics(df_final, Path(args.output_dir))
-    terminal_summary = print_full_terminal_report(df, df_final, target_col, args.task)
+    skewness_summary = analyze_skewness_with_graphics(df_final, Path(output_dir))
+    outlier_exclude_cols = {
+        target_col,
+        "day_of_week",
+        "is_weekend",
+        "rain",
+        "is_rush_hour",
+        "is_bad_weather",
+    }
+    outlier_summary = detect_outliers_iqr(
+        outlier_input_df,
+        min_unique_for_continuous=outlier_min_unique,
+        exclude_prefixes=("route_",),
+        exclude_columns=outlier_exclude_cols,
+        exclude_keywords=("_bin", "_flag", "_encoded"),
+    )
+
+    sampling_summary: dict[str, Any] = {"method": "none", "note": "Dataset scope chosen interactively at start"}
+
+    terminal_summary = print_full_terminal_report(df, df_final, target_col, task)
 
     report = {
-        "task": args.task,
-        "input_file": args.input,
+        "task": task,
+        "input_file": input_file,
         "target_col": target_col,
         "shape_final": [int(df_final.shape[0]), int(df_final.shape[1])],
         "type_groups": type_groups,
+        "completeness": {
+            "original": completeness_original,
+            "final": completeness_final,
+        },
+        "missing_value_strategy": missing_strategy,
         "cleaning": clean_summary,
         "quality": quality_summary,
         "skewness": skewness_summary,
+        "outliers_iqr": outlier_summary,
+        "sampling": sampling_summary,
         "terminal_summary": terminal_summary,
         "created_features": [
             "hour",
@@ -409,7 +603,7 @@ def main() -> None:
         ],
     }
 
-    save_outputs(df_final, target_col, Path(args.output_dir), args.task, report)
+    save_outputs(df_final, target_col, Path(output_dir), task, report)
 
     print_section("COMPLETED")
 
