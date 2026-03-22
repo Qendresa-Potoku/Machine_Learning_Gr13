@@ -243,52 +243,31 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Skewness Analysis](ReadMe-Images/Skewness.png)
 
-## Model Selection & Justification
+## Model Selection
 
-Based on the preprocessing pipeline, correlation analysis, and dataset characteristics,
-we selected **Random Forest Regressor** as the primary model for predicting `delay_min`.
+We selected **Random Forest Regressor** to predict `delay_min`.
 
----
+### Justification
 
-### Why Random Forest Regressor?
+**1. Non-Linear Relationships**
+The delay pattern across hours is clearly non-linear (negative at night, peak at midday).
+Linear Regression cannot capture this — Random Forest handles it naturally through splits.
 
-**1. Non-Linear Relationships in the Data**
-The *Impact of Time on Traffic Delay* visualization clearly shows a non-linear
-pattern — negative delays at night, peak delays around midday, and a drop again
-in the evening. Linear Regression would fit only a straight line and miss these
-patterns entirely. Random Forest captures them naturally through recursive splits.
-
-**2. Moderate Correlations Confirmed by Correlation Matrix**
-The correlation matrix showed that the strongest predictors of `delay_min` are
-`temperature` (0.57), `wind` (0.54), and `hour_cos` (-0.57) — all moderate,
-not strong linear signals. This rules out Linear Regression as a reliable model
-and favors a flexible, ensemble-based approach.
+**2. Moderate Correlations**
+The correlation matrix shows moderate signals (`temperature`: 0.57, `wind`: 0.54, `hour_cos`: -0.57).
+These are not strong enough for Linear Regression to be reliable.
 
 **3. Robust to Outliers**
-IQR analysis confirmed outliers in `delay_min`, `distance_km`, and `speed_normal`.
-Although Winsorization (1%–99% clipping) was applied, residual variance remains.
-Random Forest is inherently robust to outliers because splits are threshold-based,
-not influenced by the magnitude of extreme values.
+IQR analysis confirmed outliers in `delay_min` and `distance_km`. Random Forest is
+threshold-based, so extreme values do not distort the model.
 
 **4. No Normalization Required**
-Unlike distance-based models (KNN, SVM) or gradient-based models (Linear Regression,
-Neural Networks), Random Forest does not rely on feature scales. This makes it
-a natural fit for our mixed feature space — continuous variables (`temperature`,
-`wind`), binary flags (`is_weekend`, `is_rush_hour`), and one-hot encoded routes
-(`route_*`) — without requiring a separate scaling step.
+Unlike KNN or SVM, Random Forest does not depend on feature scale — making it a natural
+fit for our mixed feature space (continuous, binary, and one-hot encoded columns).
 
-**5. Handles High-Dimensional Feature Space**
-After one-hot encoding of the `route` column, the dataset contains 50+ binary
-features alongside continuous and discrete variables. Random Forest selects a
-random subset of features at each split, which reduces correlation between trees
-and prevents overfitting in high-dimensional settings.
-
-**6. Built-in Feature Importance**
-Random Forest produces feature importance scores out of the box, allowing
-post-training validation of our preprocessing decisions — specifically whether
-engineered features like `is_rush_hour`, `hour_sin/cos`, and `is_bad_weather`
-contribute meaningfully to delay prediction.
-
+**5. Built-in Feature Importance**
+Allows us to validate whether engineered features (`is_rush_hour`, `hour_sin/cos`,
+`is_bad_weather`) actually contribute to predicting traffic delays.
 ---
 
 ### Baseline Comparison
