@@ -265,11 +265,6 @@ threshold-based, so extreme values do not distort the model.
 Unlike KNN or SVM, Random Forest does not depend on feature scale — making it a natural
 fit for our mixed feature space (continuous, binary, and one-hot encoded columns).
 
-**5. Built-in Feature Importance**
-Allows us to validate whether engineered features (`is_rush_hour`, `hour_sin/cos`,
-`is_bad_weather`) actually contribute to predicting traffic delays.
----
-
 ### Baseline Comparison
 
 To validate the model choice, we compare against Linear Regression as a baseline:
