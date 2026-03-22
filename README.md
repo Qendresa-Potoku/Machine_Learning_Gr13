@@ -138,25 +138,41 @@ Based on the pipeline typing groups, the core attributes are:
 - **Functionality:** Defines the prediction target based on selected ML task.
 - **Logic:** Uses delay_min for regression or generates traffic_level bins for classification.
 
+![Target Creation](ReadMe-Images/Target%20Creation.png)
+
 9. **Normalization (normalize_features)**
 - **Functionality:** Scales continuous numeric features for model compatibility.
 - **Logic:** Applies StandardScaler or MinMaxScaler while excluding target and binary-like columns.
+
+![Normalization](ReadMe-Images/Normalization.png)
 
 10. **Quality and Completeness (analyze_data_quality, profile_completeness)**
 - **Functionality:** Reports dataset quality after transformations.
 - **Logic:** Computes missing values, duplicates, quality score, and completeness metrics.
 
+![Quality and Completeness](ReadMe-Images/Quality%20and%20Completeness.png)
+
 11. **Outlier Detection (detect_outliers_iqr)**
 - **Functionality:** Measures outlier counts for continuous features.
 - **Logic:** Uses IQR bounds with exclusion rules for encoded, binary, and low-cardinality columns.
+
+![Outlier Detection](ReadMe-Images/Outlier.png)
 
 12. **Terminal Report (print_full_terminal_report)**
 - **Functionality:** Generates a full end-of-pipeline textual summary.
 - **Logic:** Prints shape changes, memory usage, numeric summaries, and target distribution.
 
+![Full Terminal Report 1](ReadMe-Images/Full%20Terminal%20Report%201.png)
+![Full Terminal Report 2](ReadMe-Images/Full%20Terminal%20Report%202.png)
+![Full Terminal Report 3](ReadMe-Images/Full%20Terminal%20Report%203.png)
+![Full Terminal Report 4](ReadMe-Images/Full%20Terminal%20Report%204.png)
+![Full Terminal Report 5](ReadMe-Images/Full%20Terminal%20Report%205.png)
+
 13. **Output Export (save_outputs)**
 - **Functionality:** Saves final artifacts for downstream work.
 - **Logic:** Writes cleaned dataset CSV and structured JSON report into outputs.
+
+![Output Export](ReadMe-Images/Output%20Export.png)
 
 ### Plot Utility: [skewness_utils.py](skewness_utils.py)
 
@@ -166,6 +182,8 @@ Based on the pipeline typing groups, the core attributes are:
 - generates histogram + boxplot per selected column
 - calculates IQR outlier counts for plotted columns
 - saves plots into [outputs/skewness_plots/](outputs/skewness_plots/)
+
+![Skewness Analysis](ReadMe-Images/Skewness.png)
 
 ## Technologies Used
 
@@ -267,6 +285,7 @@ Generated plots:
 ---
 
 ## License
+
 
 
 
