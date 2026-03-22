@@ -106,17 +106,29 @@ Based on local traffic patterns in Prishtina, we have adjusted the definition of
 ![Traffic Delay by Hour](outputs/visualizations/delay_vs_hour.png)
 *Shows the impact of time on traffic delay, highlighting the morning and evening rush hours.*
 
+**Analysis Conclusion:**
+The chart confirms that the time of day plays a massive role in traffic delays, which heavily justifies using features like `hour` and `is_rush_hour`. We can clearly see "negative" delays at night (meaning empty roads where cars move faster than expected), a sharp jump during the morning rush, and a surprising peak around lunchtime (13:00). Paradoxically, delays seem to drop during the evening rush (16:00-18:00), which is unexpected and might point to a quirk in how the data was collected or a specific local anomaly.
+
 ### Delay vs Distance
 ![Delay vs Distance](outputs/visualizations/delay_vs_distance.png)
 *Correlation between distance and delay.*
+
+**Analysis Conclusion:**
+This plot helps us check if longer trips automatically mean longer delays. It appears that distance alone isn't the only factor—traffic congestion impacts both short and long trips, suggesting that *where* you are driving matters just as much as *how far* you are going.
 
 ### Top Routes by Delay
 ![Top Routes by Delay](outputs/visualizations/top_routes_delay.png)
 *Routes with the highest average delays.*
 
+**Analysis Conclusion:**
+As expected, the route from **Gërmia Park to Prishtina Center** is the most congested, with an average delay of about 1.6 minutes. Other major central routes like **Grand Prishtina Mall → Ulpiana** also show up near the top. However, the difference between the worst route and the others isn't huge, suggesting that while specific hotspots exist, delays are fairly distributed across the city's main arteries.
+
 ### Delay: Weekend vs Weekday
 ![Weekend vs Weekday](outputs/visualizations/delay_weekend_vs_weekday.png)
 *Comparison of traffic delays between weekends and weekdays.*
+
+**Analysis Conclusion:**
+This comparison clearly shows why the `is_weekend` feature is so important. Weekdays are much more chaotic, with a wider range of delays and lots of extreme outliers (some up to 24 minutes!). Weekends, on the other hand, are calm and predictable, with most cars actually arriving faster than average. The difference is night and day, confirming that the day of the week is a key driver for our model.
 
 ## Implemented Modules
 
