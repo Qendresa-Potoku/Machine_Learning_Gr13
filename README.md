@@ -7,7 +7,7 @@
     </td>
     <td valign="top">
       <p><strong>Universiteti i Prishtinës</strong></p>
-      <p>Fakulteti i Inxhinierisë« Elektrike dhe Kompjuterike</p>
+      <p>Fakulteti i Inxhinierisë Elektrike dhe Kompjuterike</p>
       <p>Inxhinieri Kompjuterike dhe Softuerike - Programi Master</p>
       <p><strong>Projekti nga lënda:</strong> Machine Learning</p>
       <p><strong>Studentët (Gr. 13):</strong></p>
