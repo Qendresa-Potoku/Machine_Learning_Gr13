@@ -260,17 +260,6 @@ threshold-based, so extreme values do not distort the model.
 Unlike KNN or SVM, Random Forest does not depend on feature scale — making it a natural
 fit for our mixed feature space (continuous, binary, and one-hot encoded columns).
 
-### Baseline Comparison
-
-To validate the model choice, we compare against Linear Regression as a baseline:
-
-| Model | Expected Strength | Limitation |
-|---|---|---|
-| Linear Regression | Fast, interpretable | Assumes linearity, sensitive to outliers |
-| **Random Forest** | Handles non-linearity, robust | Slower to train on large datasets |
-
-A higher R² and lower RMSE on the test set will confirm Random Forest
-as the superior choice for this regression task.
 ## Technologies Used
 
 - Python 3
