@@ -69,7 +69,8 @@ Machine_Learning_Gr13/
 |-- outputs/
 |   |-- cleaned_dataset_regression.csv  # Final processed dataset
 |   |-- cleaned_report_regression.json  # Detailed processing report
-|   `-- skewness_plots/                 # Auto-generated skewness/outlier plots
+|   |-- skewness_plots/                 # Auto-generated skewness/outlier plots
+|   `-- visualizations/                 # Generated traffic analysis plots
 `-- __pycache__/
 ```
 
