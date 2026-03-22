@@ -10,6 +10,11 @@
       <p>Fakulteti i Inxhinierisë Elektrike dhe Kompjuterike</p>
       <p>Inxhinieri Kompjuterike dhe Softuerike - Programi Master</p>
       <p><strong>Projekti nga lënda:</strong> Machine Learning</p>
+      <p><strong>Prof.:</strong></p>
+      <ul>
+        <li>PhD Lule Ahmedi</li>
+        <li>PhD Mërgim Hoti</li>
+      </ul>
       <p><strong>Studentët (Gr. 13):</strong></p>
       <ul>
         <li>Olta Pllana</li>
@@ -58,6 +63,7 @@ Machine_Learning_Gr13/
 |
 |-- data_analysis.py                    # Main preprocessing pipeline
 |-- skewness_utils.py                   # Skewness + histogram/boxplot generation
+|-- visualizations.py                   # Traffic visualization generation
 |-- traffic_dataset.csv                 # Input dataset
 |-- README.md                           # Project documentation
 |-- outputs/
@@ -87,6 +93,30 @@ Based on the pipeline typing groups, the core attributes are:
   - Low: `delay_min < 3`
   - Medium: `3 <= delay_min < 7`
   - High: `delay_min >= 7`
+
+## Visualizations
+
+The project includes a `visualizations.py` module to generate insightful plots for traffic analysis. 
+We have observed that traffic in **Prishtina** is particularly heavy during rush hours.
+
+**New Implementation Note:**
+Based on local traffic patterns in Prishtina, we have adjusted the definition of **evening rush hour** to be from **4:00 PM to 6:00 PM (16:00 - 18:00)**. The morning rush hour remains 7:00 AM - 10:00 AM.
+
+### Traffic Delay by Hour
+![Traffic Delay by Hour](outputs/visualizations/delay_vs_hour.png)
+*Shows the impact of time on traffic delay, highlighting the morning and evening rush hours.*
+
+### Delay vs Distance
+![Delay vs Distance](outputs/visualizations/delay_vs_distance.png)
+*Correlation between distance and delay.*
+
+### Top Routes by Delay
+![Top Routes by Delay](outputs/visualizations/top_routes_delay.png)
+*Routes with the highest average delays.*
+
+### Delay: Weekend vs Weekday
+![Weekend vs Weekday](outputs/visualizations/delay_weekend_vs_weekday.png)
+*Comparison of traffic delays between weekends and weekdays.*
 
 ## Implemented Modules
 

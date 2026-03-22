@@ -7,6 +7,7 @@ import pandas as pd
 from math import pi, sin, cos
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from skewness_utils import analyze_skewness_with_graphics
+from visualizations import visualize
 
 
 def print_section(title: str) -> None:
@@ -84,7 +85,7 @@ def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
 
     if "hour" in out.columns:
         out["is_rush_hour"] = (
-            (out["hour"].isin(range(7, 10))) | (out["hour"].isin(range(16, 19)))
+            (out["hour"].isin(range(7, 10))) | (out["hour"].isin(range(16, 18)))
         ).astype(int)
 
     if {"rain", "wind"}.issubset(out.columns):
@@ -514,6 +515,9 @@ def main() -> None:
     df_pre_clean = df_fe
 
     df_clean, clean_summary = clean_data(df_pre_clean)
+    
+    visualize(df_clean, Path(output_dir))
+
     df_encoded = encode_features(df_clean)
 
     duplicates_after_encoding = int(df_encoded.duplicated().sum())
