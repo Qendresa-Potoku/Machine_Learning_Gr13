@@ -78,13 +78,35 @@ Machine_Learning_Gr13/
 The input file [traffic_dataset.csv](traffic_dataset.csv) contains route-level traffic observations.
 Based on the pipeline typing groups, the core attributes are:
 
-| Column Group | Columns |
-|---|---|
-| Numeric | `distance_km`, `duration_normal_min`, `duration_traffic_min`, `delay_min`, `temperature`, `wind` |
-| Categorical | `origin`, `destination` |
-| Temporal | `timestamp` |
-| Binary | `is_weekend`, `rain` |
-| Discrete | `hour`, `day_of_week` |
+| Column | Type | Description |
+|---|---|---|
+| `timestamp` | DateTime | Date and time of the observation |
+| `origin` | String | Starting point of the route |
+| `destination` | String | End point of the route |
+| `distance_km` | Float | Length of the route in kilometers |
+| `duration_normal_min` | Float | Expected duration without traffic (minutes) |
+| `duration_traffic_min` | Float | Actual duration with traffic (minutes) |
+| `delay_min` | Float | Calculated delay (diff between traffic and normal) |
+| `hour` | Integer | Hour of the day (0-23) |
+| `day_of_week` | Integer | Day of the week (Monday=0, Sunday=6) |
+| `is_weekend` | Boolean | 1 if weekend, 0 otherwise |
+| `temperature` | Float | Temperature in degrees Celsius |
+| `wind` | Float | Wind speed (km/h) |
+| `rain` | Boolean | 1 if raining, 0 otherwise |
+
+
+### Data Processing Workflow
+
+This project implements a comprehensive data processing workflow consisting of multiple stages:
+
+| Step | Stage | Description | Key Actions | Module |
+|---|---|---|---|---|
+| 1 | Data Enrichment | Enrich raw traffic data | - Fetch historical weather (Open-Meteo)<br>- Merge based on timestamp<br>- Fill missing temperature/rain/wind | `enrich_dataset.py` |
+| 2 | Data Loading & Scope | Initialize dataset for analysis | - Load traffic CSV<br>- Select scope (Full vs Sampled)<br>- Parse dates | `data_analysis.py` |
+| 3 | Feature Engineering | Create model-ready features | - Temporal extras (Hour, Day)<br>- Rush hour detection (7-10 AM, 4-6 PM)<br>- Route encoding<br>- Cyclic time features | `data_analysis.py` |
+| 4 | Data Cleaning | Improve data quality | - Median imputation<br>- Deduplication<br>- Winsorization (1-99%) | `data_analysis.py` |
+| 5 | Analysis & Visualization | Generate insights | - Skewness ranking<br>- Outlier detection (IQR)<br>- Traffic trend plots | `skewness_utils.py`<br>`visualizations.py` |
+| 6 | Export | Save final artifacts | - Save cleaned CSV<br>- Generate JSON report | `data_analysis.py` |
 
 ### Target Definition
 
@@ -129,6 +151,19 @@ As expected, the route from **Gërmia Park to Prishtina Center** is the most con
 
 **Analysis Conclusion:**
 This comparison clearly shows why the `is_weekend` feature is so important. Weekdays are much more chaotic, with a wider range of delays and lots of extreme outliers (some up to 24 minutes!). Weekends, on the other hand, are calm and predictable, with most cars actually arriving faster than average. The difference is night and day, confirming that the day of the week is a key driver for our model.
+
+### Feature Correlation Matrix
+![Feature Correlation](outputs/visualizations/correlation_matrix.png)
+*Heatmap showing the correlation strength between numeric features.*
+
+**Analysis Conclusion:**
+The correlation matrix reveals several key relationships that inform our model selection:
+1.  **Weather Impact:** There is a moderate positive correlation between `temperature` (0.57) and `delay_min`, as well as `wind` (0.54). This suggests that weather conditions significantly affect traffic flow in Prishtina.
+2.  **Temporal Patterns:** The cyclic features `hour_cos` (-0.57) and `hour_sin` (-0.33) show strong negative correlations with delay, confirming that the time of day is a critical predictor.
+3.  **Traffic Dynamics:** `speed_normal` has a very high correlation with `duration_normal_min` (0.79), which is expected. However, its relationship with `delay_min` is negligible, meaning innate road speed limits don't necessarily predict congestion levels.
+
+**Model Selection Implication:**
+Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Linear Regression** model serves as a strong baseline. However, the presence of complex interactions (like Rush Hour + Bad Weather) suggests that non-linear models like **Random Forest** or **XGBoost** would likely yield higher accuracy by capturing these nuances.
 
 ## Implemented Modules
 
@@ -176,29 +211,23 @@ This comparison clearly shows why the `is_weekend` feature is so important. Week
 
 ![Target Creation](ReadMe-Images/Target%20Creation.png)
 
-8. **Normalization (normalize_features)**
-- **Functionality:** Scales continuous numeric features for model compatibility.
-- **Logic:** Applies StandardScaler or MinMaxScaler while excluding target and binary-like columns.
-
-![Normalization](ReadMe-Images/Normalization.png)
-
-9. **Quality and Completeness (analyze_data_quality, profile_completeness)**
+8. **Quality and Completeness (analyze_data_quality, profile_completeness)**
 - **Functionality:** Reports dataset quality after transformations.
 - **Logic:** Computes missing values, duplicates, quality score, and completeness metrics.
 
 ![Quality and Completeness](ReadMe-Images/Quality%20and%20Completeness.png)
 
-10. **Outlier Detection (detect_outliers_iqr)**
+9. **Outlier Detection (detect_outliers_iqr)**
 - **Functionality:** Measures outlier counts for continuous features.
 - **Logic:** Uses IQR bounds with exclusion rules for encoded, binary, and low-cardinality columns.
 
 ![Outlier Detection](ReadMe-Images/Outlier.png)
 
-11. **Terminal Report (print_full_terminal_report)**
+10. **Terminal Report (print_full_terminal_report)**
 - **Functionality:** Generates a full end-of-pipeline textual summary.
 - **Logic:** Prints shape changes, memory usage, numeric summaries, and target distribution.
 
-12. **Output Export (save_outputs)**
+11. **Output Export (save_outputs)**
 - **Functionality:** Saves final artifacts for downstream work.
 - **Logic:** Writes cleaned dataset CSV and structured JSON report into outputs.
 
@@ -322,8 +351,6 @@ Generated plots:
 - Auto-generated report and plots make results reproducible and easy to inspect.
 
 ---
-
-## License
 
 
 

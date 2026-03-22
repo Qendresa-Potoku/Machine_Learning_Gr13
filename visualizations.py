@@ -91,3 +91,26 @@ def visualize(df: pd.DataFrame, output_dir: Path) -> None:
         plt.close()
         print(f"Saved: {save_path}")
 
+    numeric_df = df.select_dtypes(include=[np.number])
+    EXCLUDE_FROM_CORR = {"duration_traffic_min", "timestamp", "origin", "destination", "route"}
+
+    cols_to_use = [
+        c for c in numeric_df.columns
+        if c not in EXCLUDE_FROM_CORR and not c.startswith("route_")
+    ]
+    numeric_df = numeric_df[cols_to_use]
+ 
+    if not numeric_df.empty and len(cols_to_use) >= 2:
+        plt.figure(figsize=(14, 11))
+        corr = numeric_df.corr()
+        mask = np.triu(np.ones_like(corr, dtype=bool))
+        sns.heatmap(corr, mask=mask, annot=True, fmt=".2f", cmap="coolwarm",
+                    vmax=1, vmin=-1, center=0, square=True,
+                    linewidths=0.5, cbar_kws={"shrink": 0.5},
+                    annot_kws={"size": 9})
+        plt.title("Correlation Matrix of Numeric Features", fontsize=16, fontweight="bold")
+        plt.tight_layout()
+        plt.savefig(viz_dir / "correlation_matrix.png", dpi=300)
+        plt.close()
+        print("Saved: correlation_matrix.png")
+

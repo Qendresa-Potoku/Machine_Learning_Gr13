@@ -5,7 +5,6 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from math import pi, sin, cos
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from skewness_utils import analyze_skewness_with_graphics
 from visualizations import visualize
 
@@ -112,7 +111,6 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     before_rows = len(cleaned)
     before_null = int(cleaned.isna().sum().sum())
 
-    # Fill missing values with median for numeric attributes.
     numeric_cols = cleaned.select_dtypes(include=[np.number]).columns.tolist()
     median_imputed_cols: list[str] = []
     for col in numeric_cols:
@@ -120,7 +118,6 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
             cleaned[col] = cleaned[col].fillna(cleaned[col].median())
             median_imputed_cols.append(col)
 
-    # Remove duplicate rows after imputation.
     cleaned = cleaned.drop_duplicates().reset_index(drop=True)
 
     after_rows = len(cleaned)
@@ -133,7 +130,6 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         "duration_normal_min",
     ]
 
-    # Check IQR outlier counts for selected continuous columns.
     iqr_outlier_counts_selected: dict[str, int] = {}
     for col in columns_to_check_iqr:
         if col not in cleaned.columns:
@@ -225,39 +221,6 @@ def create_target(df: pd.DataFrame, task: str) -> tuple[pd.DataFrame, str]:
         return out, target_col
 
     raise ValueError("Task must be one of: regression or classification")
-
-def normalize_features(df: pd.DataFrame, target_col: str, method: str = "standard") -> pd.DataFrame:
-    print_section("6) NORMALIZATION")
-
-    out = df.copy()
-
-    numeric_cols = out.select_dtypes(include=[np.number]).columns.tolist()
-
-    numeric_cols = [col for col in numeric_cols if col != target_col]
-    numeric_cols = [
-        col
-        for col in numeric_cols
-        if not col.startswith("route_") and out[col].nunique(dropna=True) > 2
-    ]
-
-    print(f"Columns to normalize: {numeric_cols}")
-
-    if not numeric_cols:
-        print("No numeric columns found for normalization.")
-        return out
-
-    if method == "standard":
-        scaler = StandardScaler()
-    elif method == "minmax":
-        scaler = MinMaxScaler()
-    else:
-        print("No normalization applied.")
-        return out
-
-    out[numeric_cols] = scaler.fit_transform(out[numeric_cols])
-
-    print(f"Normalization applied using: {method}")
-    return out
 
 
 def encode_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -531,8 +494,6 @@ def main() -> None:
 
     outlier_input_df = df_final.copy()
 
-    if scaling != "none":
-        df_final = normalize_features(df_final, target_col, method=scaling)
 
     completeness_final = profile_completeness(df_final, label="final")
     quality_summary = analyze_data_quality(df_final)
