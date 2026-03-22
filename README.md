@@ -6,14 +6,14 @@
       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/University_of_Prishtina_logo.svg/1200px-University_of_Prishtina_logo.svg.png" width="120" alt="University Logo" />
     </td>
     <td valign="top">
-      <p><strong>Universiteti i PrishtinÃ«s</strong></p>
-      <p>Fakulteti i InxhinierisÃ« Elektrike dhe Kompjuterike</p>
+      <p><strong>Universiteti i Prishtinës</strong></p>
+      <p>Fakulteti i Inxhinierisë Elektrike dhe Kompjuterike</p>
       <p>Inxhinieri Kompjuterike dhe Softuerike - Programi Master</p>
-      <p><strong>Projekti nga lÃ«nda:</strong> Machine Learning</p>
-      <p><strong>StudentÃ«t (Gr. 13):</strong></p>
+      <p><strong>Projekti nga lënda:</strong> Machine Learning</p>
+      <p><strong>Studentët (Gr. 13):</strong></p>
       <ul>
         <li>Olta Pllana</li>
-        <li>QÃ«ndresa Potoku</li>
+        <li>Qëndresa Potoku</li>
         <li>Besarta Berisha</li>
       </ul>
     </td>
@@ -131,25 +131,35 @@ Based on the pipeline typing groups, the core attributes are:
 - **Functionality:** Defines the prediction target based on selected ML task.
 - **Logic:** Uses delay_min for regression or generates traffic_level bins for classification.
 
+![Target Creation](ReadMe-Images/Target%20Creation.png)
+
 8. **Normalization (normalize_features)**
 - **Functionality:** Scales continuous numeric features for model compatibility.
 - **Logic:** Applies StandardScaler or MinMaxScaler while excluding target and binary-like columns.
+
+![Normalization](ReadMe-Images/Normalization.png)
 
 9. **Quality and Completeness (analyze_data_quality, profile_completeness)**
 - **Functionality:** Reports dataset quality after transformations.
 - **Logic:** Computes missing values, duplicates, quality score, and completeness metrics.
 
+![Quality and Completeness](ReadMe-Images/Quality%20and%20Completeness.png)
+
 10. **Outlier Detection (detect_outliers_iqr)**
 - **Functionality:** Measures outlier counts for continuous features.
 - **Logic:** Uses IQR bounds with exclusion rules for encoded, binary, and low-cardinality columns.
 
+![Outlier Detection](ReadMe-Images/Outlier.png)
+
 11. **Terminal Report (print_full_terminal_report)**
 - **Functionality:** Generates a full end-of-pipeline textual summary.
-- **Logic:** Prints shape changes, numeric summaries, and target distribution.
+- **Logic:** Prints shape changes, memory usage, numeric summaries, and target distribution.
 
 12. **Output Export (save_outputs)**
 - **Functionality:** Saves final artifacts for downstream work.
 - **Logic:** Writes cleaned dataset CSV and structured JSON report into outputs.
+
+![Output Export](ReadMe-Images/Output%20Export.png)
 
 ### Plot Utility: [skewness_utils.py](skewness_utils.py)
 
@@ -159,6 +169,8 @@ Based on the pipeline typing groups, the core attributes are:
 - generates histogram + boxplot per selected column
 - calculates IQR outlier counts for plotted columns
 - saves plots into [outputs/skewness_plots/](outputs/skewness_plots/)
+
+![Skewness Analysis](ReadMe-Images/Skewness.png)
 
 ## Technologies Used
 
@@ -259,6 +271,7 @@ Generated plots:
 ---
 
 ## License
+
 
 
 
