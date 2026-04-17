@@ -183,48 +183,56 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 - **Logic:** Uses interactive input and reproducible random sampling when sample mode is selected.
 
 ![Dataset Scope Selection](ReadMe-Images/Dataset%20Scope%20Selection.png)
+*Figure 1: The initial prompt for choosing full-dataset or sampled processing.*
 
 2. **Data Type Analysis (analyze_data_types)**
 - **Functionality:** Checks expected feature groups (numeric, categorical, temporal, binary, discrete).
 - **Logic:** Verifies column presence per group and prints dtype diagnostics for each column.
 
 ![Data Type Analysis](ReadMe-Images/Data%20Type%20Analysis.png)
+*Figure 2: Type checks for the expected numeric, categorical, temporal, and binary columns.*
 
 3. **Feature Engineering (feature_engineering)**
 - **Functionality:** Creates additional features for time, weather, route context, and cyclic hour encoding.
 - **Logic:** Derives hour, day_of_week, is_weekend, route, is_rush_hour, is_bad_weather, speed_normal, hour_sin, and hour_cos.
 
 ![Feature Engineering](ReadMe-Images/Feature%20Engineering.png)
+*Figure 3: Feature creation for route context, rush-hour flags, and cyclic time encoding.*
 
 4. **Data Cleaning (clean_data)**
 - **Functionality:** Handles missing values and prepares robust numeric features.
 - **Logic:** Fills numeric nulls with median values, reports selected-column IQR counts, and applies 1%-99% winsorization to `delay_min` and `speed_normal`.
 
 ![Data Cleaning](ReadMe-Images/Data%20Cleaning.png)
+*Figure 4: Cleaning summary showing imputation, outlier reporting, and winsorization.*
 
 5. **Categorical Encoding (encode_features)**
 - **Functionality:** Converts route text into model-ready binary indicators.
 - **Logic:** Uses one-hot encoding via pd.get_dummies for the route feature.
 
 ![Categorical Encoding](ReadMe-Images/Categorical%20Encoding.png)
+*Figure 5: One-hot encoding of route categories into binary features.*
 
 6. **Column Pruning (drop_unused_columns)**
 - **Functionality:** Drops raw, non-model columns and leakage-prone fields.
 - **Logic:** Removes timestamp, origin, destination, route, hour, rain, and duration_traffic_min.
 
 ![Column Pruning](ReadMe-Images/Column%20Pruning.png)
+*Figure 6: Pruning of raw fields and leakage-prone columns before modeling.*
 
 7. **Target Creation (create_target)**
 - **Functionality:** Defines the prediction target based on selected ML task.
 - **Logic:** Uses delay_min for regression or generates traffic_level bins for classification.
 
 ![Target Creation](ReadMe-Images/Target%20Creation.png)
+*Figure 7: Target selection for regression or classification mode.*
 
 8. **Quality and Completeness (analyze_data_quality, profile_completeness)**
 - **Functionality:** Reports dataset quality after transformations.
 - **Logic:** Computes missing values, duplicates, quality score, and completeness metrics.
 
 ![Quality and Completeness](ReadMe-Images/Quality%20and%20Completeness.png)
+*Figure 8: Quality checks covering missing values, duplicates, and completeness.*
 
 9. **Terminal Report (print_full_terminal_report)**
 - **Functionality:** Generates a full end-of-pipeline textual summary.
@@ -235,33 +243,41 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 - **Logic:** Writes cleaned dataset CSV and structured JSON report into outputs.
 
 ![Output Export](ReadMe-Images/Output%20Export.png)
+*Figure 9: Final export summary for the cleaned dataset and JSON report.*
 
 11. **True Outlier Analysis (analyze_true_outliers)**
 - **Functionality:** Detects and classifies outliers before model training.
 - **Logic:** Uses IQR, top-1% thresholds, and contextual rules to separate normal, valid, suspicious, and invalid rows, then generates diagnostic plots and a structured summary.
 
 ![Outlier Detection](ReadMe-Images/Outlier.png)
+*Figure 10: Terminal summary for the true outlier analysis step.*
 ![Outlier Analysis Terminal](ReadMe-Images/Phase%202%20-%20Outlier%20Analysis.png)
+*Figure 11: Screenshot of the terminal output for outlier classification and counts.*
 
 12. **Regression Experiments (evaluate_regression_outlier_experiments)**
 - **Functionality:** Compares model performance with outliers versus after removing suspicious/invalid rows.
 - **Logic:** Trains two Random Forest regressors on the same holdout split and exports comparison metrics plus a visualization.
 
 ![With vs Without Outliers](outputs/model_evaluation/metrics_with_vs_without_outliers.png)
+*Figure 12: Comparison of regression performance with and without outlier handling.*
 ![Regression Experiments Terminal](ReadMe-Images/Phase%202%20-%20Model%20Experiments.png)
+*Figure 13: Terminal output for the with-vs-without outlier regression experiments.*
 
 13. **Final Regression Training (train_final_regression_model)**
 - **Functionality:** Trains the final regression model and exports the production-ready artifacts.
 - **Logic:** Uses sample weighting for outlier-aware learning, then saves the model, predictions, feature importances, and actual-vs-predicted plot.
 
 ![Final Model Evaluation](outputs/final_model/actual_vs_predicted.png)
+*Figure 14: Actual versus predicted delay values for the final weighted model.*
 ![Final Training Terminal](ReadMe-Images/Phase%202%20-%20Final%20Model%20Training.png)
+*Figure 15: Terminal output for final weighted model training and artifact export.*
 
 14. **Final ML Readiness Cleanup**
 - **Functionality:** Removes duplicate rows and zero-variance columns before the final export.
 - **Logic:** Confirms the final processed dataset is compact, duplicate-free, and ready for downstream use.
 
 ![Final Cleanup Terminal](ReadMe-Images/Phase%202%20-%20Final%20Cleanup.png)
+*Figure 16: Terminal output for the final cleanup and readiness checks.*
 
 ### Plot Utility: [skewness_utils.py](skewness_utils.py)
 
@@ -273,6 +289,7 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 - saves plots into [outputs/skewness_plots/](outputs/skewness_plots/)
 
 ![Skewness Analysis](ReadMe-Images/Skewness.png)
+*Figure 17: Skewness analysis and outlier diagnostics for selected numeric features.*
 
 ## Model Selection
 
