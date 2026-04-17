@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from math import pi, sin, cos
+from outlier_analysis_utils import analyze_true_outliers
 from skewness_utils import analyze_skewness_with_graphics
 from visualizations import visualize
 
@@ -247,6 +248,7 @@ def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
         "route",          # Drop after one-hot encoding
         "hour",           # Not needed after sin/cos encoding
         "rain",           # Dropped after creating is_bad_weather (constant/no-signal in current data)
+        "outlier_type",   # Analysis-only label (do not train on this)
         "duration_traffic_min",  # IMPORTANT: Remove to prevent data leakage
     ]
 
@@ -406,7 +408,10 @@ def main() -> None:
     
     visualize(df_clean, Path(output_dir))
 
-    df_encoded = encode_features(df_clean)
+    # Outlier analysis is for understanding only; no outlier-based row filtering is applied.
+    df_with_outliers, outlier_analysis_summary = analyze_true_outliers(df_clean, Path(output_dir))
+
+    df_encoded = encode_features(df_with_outliers)
 
     duplicates_after_encoding = int(df_encoded.duplicated().sum())
     print(f"Duplicate rows after encoding: {duplicates_after_encoding}")
@@ -465,6 +470,7 @@ def main() -> None:
         "final_cleanup": final_cleanup_summary,
         "quality": quality_summary,
         "skewness": skewness_summary,
+        "outlier_analysis": outlier_analysis_summary,
         "sampling": sampling_summary,
         "terminal_summary": terminal_summary,
         "created_features": [
