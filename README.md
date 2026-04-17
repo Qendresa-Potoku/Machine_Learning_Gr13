@@ -3,7 +3,7 @@
 <table>
   <tr>
     <td width="150" align="center" valign="center">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/University_of_Prishtina_logo.svg/1200px-University_of_Prishtina_logo.svg.png" width="120" alt="University Logo" />
+      <img src="https://logowik.com/content/uploads/images/university-of-prishtina2246.logowik.com.webp" width="120" alt="University Logo" />
     </td>
     <td valign="top">
       <p><strong>Universiteti i Prishtinës</strong></p>
@@ -50,6 +50,9 @@ The pipeline is designed for machine learning preparation and supports:
 - data cleaning with median imputation + deduplication
 - final ML-readiness cleanup (drop post-pruning duplicates and zero-variance columns)
 - IQR outlier counting (reporting only) and percentile winsorization
+- true outlier analysis with classification of valid, suspicious, and invalid rows
+- regression experiments with and without outlier handling
+- final weighted model training and export of model artifacts
 - encoding and feature pruning
 - skewness analysis with generated plots
 - export of cleaned dataset and JSON report
@@ -62,6 +65,9 @@ The current run configuration in [data_analysis.py](data_analysis.py) uses the r
 Machine_Learning_Gr13/
 |
 |-- data_analysis.py                    # Main preprocessing pipeline
+|-- model_training_utils.py             # Regression experiments and final model training
+|-- modeling_pipeline.py                # Post-cleaning modeling workflow
+|-- outlier_analysis_utils.py           # Outlier analysis and diagnostics
 |-- skewness_utils.py                   # Skewness + histogram/boxplot generation
 |-- visualizations.py                   # Traffic visualization generation
 |-- traffic_dataset.csv                 # Input dataset
@@ -69,6 +75,9 @@ Machine_Learning_Gr13/
 |-- outputs/
 |   |-- cleaned_dataset_regression.csv  # Final processed dataset
 |   |-- cleaned_report_regression.json  # Detailed processing report
+|   |-- final_model/                    # Final trained model artifacts
+|   |-- model_evaluation/               # With vs without outlier experiments
+|   |-- outlier_analysis/               # Outlier analysis plots and summaries
 |   |-- skewness_plots/                 # Auto-generated skewness/outlier plots
 |   `-- visualizations/                 # Generated traffic analysis plots
 `-- __pycache__/
@@ -227,6 +236,24 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Output Export](ReadMe-Images/Output%20Export.png)
 
+11. **True Outlier Analysis (analyze_true_outliers)**
+- **Functionality:** Detects and classifies outliers before model training.
+- **Logic:** Uses IQR, top-1% thresholds, and contextual rules to separate normal, valid, suspicious, and invalid rows, then generates diagnostic plots and a structured summary.
+
+![Outlier Detection](ReadMe-Images/Outlier.png)
+
+12. **Regression Experiments (evaluate_regression_outlier_experiments)**
+- **Functionality:** Compares model performance with outliers versus after removing suspicious/invalid rows.
+- **Logic:** Trains two Random Forest regressors on the same holdout split and exports comparison metrics plus a visualization.
+
+![With vs Without Outliers](outputs/model_evaluation/metrics_with_vs_without_outliers.png)
+
+13. **Final Regression Training (train_final_regression_model)**
+- **Functionality:** Trains the final regression model and exports the production-ready artifacts.
+- **Logic:** Uses sample weighting for outlier-aware learning, then saves the model, predictions, feature importances, and actual-vs-predicted plot.
+
+![Final Model Evaluation](outputs/final_model/actual_vs_predicted.png)
+
 ### Plot Utility: [skewness_utils.py](skewness_utils.py)
 
 `analyze_skewness_with_graphics`
@@ -306,6 +333,29 @@ From the latest generated report in [outputs/cleaned_report_regression.json](out
 - Original shape: 32,070 rows x 13 columns
 - Processed shape: 26,347 rows x 62 columns
 
+### Outlier Analysis Summary
+
+- Outlier rows detected: 11,352
+- Normal rows: 20,718
+- Invalid rows: 7,852
+- Suspicious rows: 1,140
+- Valid rows: 2,360
+- Outliers in rush hour: 15.55%
+- Outliers in bad weather: 20.93%
+
+### Regression Experiment Summary
+
+- With outliers: MAE 0.2889, RMSE 0.5967, R² 0.9603
+- Without outliers: MAE 0.8240, RMSE 1.5581, R² 0.7290
+- Final weighted model: MAE 0.2972, RMSE 0.6019, R² 0.9596
+
+Generated comparison and training artifacts:
+
+| **With vs Without Outliers** | **Final Model Fit** |
+| :---: | :---: |
+| ![With vs Without Outliers](outputs/model_evaluation/metrics_with_vs_without_outliers.png) | ![Actual vs Predicted](outputs/final_model/actual_vs_predicted.png) |
+| *Figure 9: Comparison of regression performance with and without outlier handling.* | *Figure 10: Actual vs predicted delay for the final weighted model.* |
+
 ### Cleaning Summary
 
 - Rows before cleaning: 32,070
@@ -366,6 +416,7 @@ Generated plots:
 - The project demonstrates a complete preprocessing workflow from raw traffic logs to ML-ready features.
 - Feature engineering includes temporal, route-based, weather-aware, and cyclic transformations.
 - Outlier handling is non-destructive: IQR is used for analysis/reporting, while winsorization caps extreme values in selected columns.
+- Model training now includes both a direct comparison of outlier handling strategies and a final weighted regression model.
 - The pipeline is modular and can be extended for both regression and classification tasks.
 - Auto-generated report and plots make results reproducible and easy to inspect.
 
