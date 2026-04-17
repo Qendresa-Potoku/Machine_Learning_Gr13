@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from math import pi, sin, cos
+from model_training_utils import evaluate_regression_outlier_experiments, train_final_regression_model
 from outlier_analysis_utils import analyze_true_outliers
 from skewness_utils import analyze_skewness_with_graphics
 from visualizations import visualize
@@ -236,7 +237,7 @@ def encode_features(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
+def drop_unused_columns(df: pd.DataFrame, keep_outlier_type: bool = False) -> pd.DataFrame:
     """Drop columns that are not needed for modeling (prevent data leakage and reduce dimensionality)."""
     print_section("DROP UNUSED COLUMNS")
     out = df.copy()
@@ -248,9 +249,11 @@ def drop_unused_columns(df: pd.DataFrame) -> pd.DataFrame:
         "route",          # Drop after one-hot encoding
         "hour",           # Not needed after sin/cos encoding
         "rain",           # Dropped after creating is_bad_weather (constant/no-signal in current data)
-        "outlier_type",   # Analysis-only label (do not train on this)
         "duration_traffic_min",  # IMPORTANT: Remove to prevent data leakage
     ]
+
+    if not keep_outlier_type:
+        columns_to_drop.append("outlier_type")  # Analysis-only label (do not train on this)
 
     existing_to_drop = [col for col in columns_to_drop if col in out.columns]
     out = out.drop(columns=existing_to_drop)
@@ -419,8 +422,30 @@ def main() -> None:
         df_encoded = df_encoded.drop_duplicates().reset_index(drop=True)
         print(f"Removed duplicates after encoding: {duplicates_after_encoding}")
 
-    df_final = drop_unused_columns(df_encoded)
-    df_final, target_col = create_target(df_final, task)
+    # Keep outlier_type temporarily so we can run the with/without outlier experiments.
+    df_modeling = drop_unused_columns(df_encoded, keep_outlier_type=True)
+    df_modeling, target_col = create_target(df_modeling, task)
+
+    model_evaluation_summary: dict[str, Any] = {}
+    final_model_training_summary: dict[str, Any] = {}
+    if task == "regression":
+        print_section("PHASE 2 - MODEL EXPERIMENTS")
+        model_evaluation_summary = evaluate_regression_outlier_experiments(
+            df=df_modeling,
+            target_col=target_col,
+            output_dir=Path(output_dir),
+            random_state=42,
+        )
+        print_section("PHASE 2 - FINAL MODEL TRAINING")
+        final_model_training_summary = train_final_regression_model(
+            df=df_modeling,
+            target_col=target_col,
+            output_dir=Path(output_dir),
+            random_state=42,
+        )
+
+    # Final exported dataset should not include outlier labels as model features.
+    df_final = df_modeling.drop(columns=["outlier_type"], errors="ignore")
 
     print_section("FINAL ML READINESS CLEANUP")
     rows_before_final_cleanup = len(df_final)
@@ -471,6 +496,8 @@ def main() -> None:
         "quality": quality_summary,
         "skewness": skewness_summary,
         "outlier_analysis": outlier_analysis_summary,
+        "model_evaluation": model_evaluation_summary,
+        "final_model_training": final_model_training_summary,
         "sampling": sampling_summary,
         "terminal_summary": terminal_summary,
         "created_features": [

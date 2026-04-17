@@ -1,0 +1,62 @@
+feature,importance
+temperature,0.43556107988785475
+duration_normal_min,0.1591007999140555
+day_of_week,0.0881281206472319
+is_weekend,0.08446983304060578
+hour_sin,0.07689714837364292
+speed_normal,0.03492624661411286
+wind,0.030230510426258086
+hour_cos,0.023571199156221707
+distance_km,0.017703489078172967
+"route_Zahir Pajaziti, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.00858269464301466
+"route_Sunny Hill, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.00552109579707676
+"route_Germia Park, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo",0.003814262834453891
+"route_Prishtine Center, Prishtine, Kosovo → Fushe Kosove, Kosovo",0.003552995893119403
+"route_Bregu i Diellit, Prishtine, Kosovo → Lisja, Prishtine, Kosovo",0.0031215527991584097
+is_bad_weather,0.002717497369851369
+is_rush_hour,0.0018256338816967613
+"route_Germia Park, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.0016014247601196915
+"route_Arberia, Prishtine, Kosovo → Gazi Rada, Prishtine, Kosovo",0.0015784839217589607
+"route_Prishtine Center, Prishtine, Kosovo → Germia Park, Prishtine, Kosovo",0.0015597545284196641
+"route_Bregu i Diellit, Prishtine, Kosovo → Germia Park, Prishtine, Kosovo",0.0014991701604679343
+"route_Arberia, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo",0.0012226152343988283
+"route_Gazi Rada, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.0010857380818057815
+"route_Prishtine Center, Prishtine, Kosovo → Veternik, Prishtine, Kosovo",0.000991007896845698
+"route_Veternik, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.0009641439613134201
+"route_Prishtine Center, Prishtine, Kosovo → Prishtina e RE, Prishtine, Kosovo",0.0008014916717828633
+"route_Fushe Kosove, Kosovo → Prishtine Center, Prishtine, Kosovo",0.0007901452752897083
+"route_Veternik, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo",0.0005833278095991306
+"route_Ulpiana, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo",0.0005813087634828786
+"route_Dardania, Prishtine, Kosovo → Gazi Rada, Prishtine, Kosovo",0.0005611059999698345
+"route_Prishtine Center, Prishtine, Kosovo → Grand Prishtina Mall, Prishtine, Kosovo",0.000541589862770517
+"route_Prishtina e RE, Prishtine, Kosovo → Dardania, Prishtine, Kosovo",0.000515759805244871
+"route_Gazi Rada, Prishtine, Kosovo → Zahir Pajaziti, Prishtine, Kosovo",0.0004197787957519471
+"route_Sunny Hill, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo",0.00040671122259472827
+"route_Emshir, Prishtine, Kosovo → Dardania, Prishtine, Kosovo",0.0003970770060992334
+"route_Zahir Pajaziti, Prishtine, Kosovo → Bregu i Diellit, Prishtine, Kosovo",0.0003844259270256389
+"route_Emshir, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.00035151000617849925
+"route_Prishtine Center, Prishtine, Kosovo → Albi Mall, Prishtine, Kosovo",0.0003190311444314458
+"route_Grand Prishtina Mall, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo",0.00029712611963201744
+"route_Prishtine Center, Prishtine, Kosovo → Zahir Pajaziti, Prishtine, Kosovo",0.0002873156623226198
+"route_Kalabria, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.0002679861982038626
+"route_Arberia, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.0002471603491306883
+"route_Prishtine Center, Prishtine, Kosovo → Arberia, Prishtine, Kosovo",0.0002328333826076839
+"route_Maklleshi, Prishtine, Kosovo → Gazi Rada, Prishtine, Kosovo",0.00022925318279510355
+"route_Maklleshi, Prishtine, Kosovo → Emshir, Prishtine, Kosovo",0.00022002905897824696
+"route_Prishtine Center, Prishtine, Kosovo → Gazi Rada, Prishtine, Kosovo",0.00021968359851019575
+"route_Prishtine Center, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo",0.00017799027416162179
+"route_Albi Mall, Prishtine, Kosovo → Veternik, Prishtine, Kosovo",0.0001606751160449732
+"route_Prishtine Center, Prishtine, Kosovo → Emshir, Prishtine, Kosovo",0.00015980658277925353
+"route_Prishtina Airport, Kosovo → Prishtine Center, Prishtine, Kosovo",0.00014989511750580913
+"route_Qafa, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",0.00011830969909388197
+"route_Dardania, Prishtine, Kosovo → Ulpiana, Prishtine, Kosovo",0.00010066144513228207
+"route_Prishtine Center, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo",9.403602936320001e-05
+"route_Lisja, Prishtine, Kosovo → Sunny Hill, Prishtine, Kosovo",7.873781858160684e-05
+"route_Dardania, Prishtine, Kosovo → Kalabria, Prishtine, Kosovo",7.870552374934744e-05
+"route_Maklleshi, Prishtine, Kosovo → Lisja, Prishtine, Kosovo",8.801721334236988e-09
+"route_Prishtine Hospital, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",4.7695641467971665e-09
+"route_Maklleshi, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",4.577020543572802e-09
+"route_Prishtine Center, Prishtine, Kosovo → Lisja, Prishtine, Kosovo",4.201537329111822e-09
+"route_Prishtine Center, Prishtine, Kosovo → Maklleshi, Prishtine, Kosovo",3.944529342680281e-09
+"route_Lisja, Prishtine, Kosovo → Prishtine Center, Prishtine, Kosovo",3.2921882495503796e-09
+"route_University of Prishtina, Kosovo → Prishtine Center, Prishtine, Kosovo",3.0629678006594866e-09

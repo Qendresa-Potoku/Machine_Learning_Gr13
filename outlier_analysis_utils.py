@@ -44,6 +44,13 @@ def analyze_true_outliers(df: pd.DataFrame, output_dir: Path) -> tuple[pd.DataFr
     iqr_high = q3 + 1.5 * iqr
     q99 = float(delay_series.quantile(0.99))
 
+    delay_std = float(delay_series.std(ddof=0))
+    if delay_std > 0:
+        delay_z = ((delay_series - float(delay_series.mean())) / delay_std).abs()
+        z_outlier_mask = delay_z > 3.0
+    else:
+        z_outlier_mask = pd.Series(False, index=delay_series.index)
+
     iqr_delay_mask = (delay_series < iqr_low) | (delay_series > iqr_high)
     top1_delay_mask = delay_series >= q99
     high_delay_mask = (delay_series > iqr_high) | top1_delay_mask
@@ -87,6 +94,7 @@ def analyze_true_outliers(df: pd.DataFrame, output_dir: Path) -> tuple[pd.DataFr
     print(f"  Top 1% threshold (delay_min q99): {q99:.4f}")
     print(f"  IQR outliers (delay_min): {int(iqr_delay_mask.sum()):,}")
     print(f"  Top 1% outliers (delay_min): {int(top1_delay_mask.sum()):,}")
+    print(f"  Z-score outliers (|z| > 3 on delay_min): {int(z_outlier_mask.sum()):,}")
 
     print("\nStep 2 - Outlier Classification")
     print(f"  valid: {valid_count:,} ({_safe_pct(valid_count, total_rows):.2f}% of full dataset)")
@@ -213,6 +221,27 @@ def analyze_true_outliers(df: pd.DataFrame, output_dir: Path) -> tuple[pd.DataFr
         plt.savefig(outlier_dir / "scatter_delay_vs_speed_normal.png", dpi=300)
         plt.close()
 
+    if "temperature" in out.columns:
+        plt.figure(figsize=(9, 6))
+        scatter_temp_df = out[["delay_min", "temperature", "outlier_type"]].copy()
+        if len(scatter_temp_df) > 12000:
+            scatter_temp_df = scatter_temp_df.sample(n=12000, random_state=42)
+        sns.scatterplot(
+            data=scatter_temp_df,
+            x="temperature",
+            y="delay_min",
+            hue="outlier_type",
+            hue_order=["normal", "valid", "suspicious", "invalid"],
+            alpha=0.6,
+            s=25,
+        )
+        plt.title("Delay vs Temperature")
+        plt.xlabel("temperature")
+        plt.ylabel("delay_min")
+        plt.tight_layout()
+        plt.savefig(outlier_dir / "scatter_delay_vs_temperature.png", dpi=300)
+        plt.close()
+
     full_corr = _corr_for_analysis(out)
     outlier_corr = _corr_for_analysis(outliers_df)
 
@@ -290,6 +319,10 @@ def analyze_true_outliers(df: pd.DataFrame, output_dir: Path) -> tuple[pd.DataFr
             "top_1pct": {
                 "q99_threshold": round(q99, 6),
                 "outlier_count": int(top1_delay_mask.sum()),
+            },
+            "z_score": {
+                "threshold": 3.0,
+                "outlier_count": int(z_outlier_mask.sum()),
             },
         },
         "counts": {
