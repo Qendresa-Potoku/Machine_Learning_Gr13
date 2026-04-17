@@ -241,18 +241,27 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 - **Logic:** Uses IQR, top-1% thresholds, and contextual rules to separate normal, valid, suspicious, and invalid rows, then generates diagnostic plots and a structured summary.
 
 ![Outlier Detection](ReadMe-Images/Outlier.png)
+![Outlier Analysis Terminal](ReadMe-Images/Phase%202%20-%20Outlier%20Analysis.png)
 
 12. **Regression Experiments (evaluate_regression_outlier_experiments)**
 - **Functionality:** Compares model performance with outliers versus after removing suspicious/invalid rows.
 - **Logic:** Trains two Random Forest regressors on the same holdout split and exports comparison metrics plus a visualization.
 
 ![With vs Without Outliers](outputs/model_evaluation/metrics_with_vs_without_outliers.png)
+![Regression Experiments Terminal](ReadMe-Images/Phase%202%20-%20Model%20Experiments.png)
 
 13. **Final Regression Training (train_final_regression_model)**
 - **Functionality:** Trains the final regression model and exports the production-ready artifacts.
 - **Logic:** Uses sample weighting for outlier-aware learning, then saves the model, predictions, feature importances, and actual-vs-predicted plot.
 
 ![Final Model Evaluation](outputs/final_model/actual_vs_predicted.png)
+![Final Training Terminal](ReadMe-Images/Phase%202%20-%20Final%20Model%20Training.png)
+
+14. **Final ML Readiness Cleanup**
+- **Functionality:** Removes duplicate rows and zero-variance columns before the final export.
+- **Logic:** Confirms the final processed dataset is compact, duplicate-free, and ready for downstream use.
+
+![Final Cleanup Terminal](ReadMe-Images/Phase%202%20-%20Final%20Cleanup.png)
 
 ### Plot Utility: [skewness_utils.py](skewness_utils.py)
 
