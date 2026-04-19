@@ -61,6 +61,10 @@ The pipeline is designed for machine learning preparation and supports:
 
 The current run configuration in [data_analysis.py](data_analysis.py) uses the regression task with `delay_min` as target and exports results to [outputs/](outputs/).
 
+### Output Artifacts
+
+The main generated files are [outputs/cleaned_dataset_regression.csv](outputs/cleaned_dataset_regression.csv), [outputs/cleaned_report_regression.json](outputs/cleaned_report_regression.json), and the plots under [outputs/](outputs/).
+
 ## Phase 1 - Data Preparation
 
 ## Repository Structure
