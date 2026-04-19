@@ -371,9 +371,9 @@ From the latest generated report in [outputs/cleaned_report_regression.json](out
 
 ### Regression Experiment Summary
 
-- With outliers: MAE 0.2889, RMSE 0.5967, R┬▓ 0.9603
-- Without outliers: MAE 0.8240, RMSE 1.5581, R┬▓ 0.7290
-- Final weighted model: MAE 0.2972, RMSE 0.6019, R┬▓ 0.9596
+- With outliers: MAE 0.2889, RMSE 0.5967, R┬ 0.9603
+- Without outliers: MAE 0.8240, RMSE 1.5581, R┬ 0.7290
+- Final weighted model: MAE 0.2972, RMSE 0.6019, R┬ 0.9596
 
 Generated comparison and training artifacts:
 
