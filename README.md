@@ -1,4 +1,4 @@
-# Traffic Dataset Preprocessing Pipeline
+﻿# Traffic Dataset Preprocessing Pipeline
 
 <table>
   <tr>
@@ -30,6 +30,8 @@
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Phase 1 - Data Preparation](#phase-1---data-preparation)
+- [Phase 2 - Outlier Analysis and Training](#phase-2---outlier-analysis-and-training)
 - [Repository Structure](#repository-structure)
 - [Dataset Description](#dataset-description)
 - [Implemented Modules](#implemented-modules)
@@ -58,6 +60,8 @@ The pipeline is designed for machine learning preparation and supports:
 - export of cleaned dataset and JSON report
 
 The current run configuration in [data_analysis.py](data_analysis.py) uses the regression task with `delay_min` as target and exports results to [outputs/](outputs/).
+
+## Phase 1 - Data Preparation
 
 ## Repository Structure
 
@@ -145,14 +149,14 @@ The chart confirms that the time of day plays a massive role in traffic delays, 
 *Correlation between distance and delay.*
 
 **Analysis Conclusion:**
-This plot helps us check if longer trips automatically mean longer delays. It appears that distance alone isn't the only factor—traffic congestion impacts both short and long trips, suggesting that *where* you are driving matters just as much as *how far* you are going.
+This plot helps us check if longer trips automatically mean longer delays. It appears that distance alone is not the only factor - traffic congestion impacts both short and long trips, suggesting that *where* you are driving matters just as much as *how far* you are going.
 
 ### Top Routes by Delay
 ![Top Routes by Delay](outputs/visualizations/top_routes_delay.png)
 *Routes with the highest average delays.*
 
 **Analysis Conclusion:**
-As expected, the route from **Gërmia Park to Prishtina Center** is the most congested, with an average delay of about 1.6 minutes. Other major central routes like **Grand Prishtina Mall → Ulpiana** also show up near the top. However, the difference between the worst route and the others isn't huge, suggesting that while specific hotspots exist, delays are fairly distributed across the city's main arteries.
+As expected, the route from **G├½rmia Park to Prishtina Center** is the most congested, with an average delay of about 1.6 minutes. Other major central routes like **Grand Prishtina Mall ΓåÆ Ulpiana** also show up near the top. However, the difference between the worst route and the others isn't huge, suggesting that while specific hotspots exist, delays are fairly distributed across the city's main arteries.
 
 ### Delay: Weekend vs Weekday
 ![Weekend vs Weekday](outputs/visualizations/delay_weekend_vs_weekday.png)
@@ -184,15 +188,11 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Dataset Scope Selection](ReadMe-Images/Dataset%20Scope%20Selection.png)
 
-*Figure 1: The initial prompt for choosing full-dataset or sampled processing.*
-
 2. **Data Type Analysis (analyze_data_types)**
 - **Functionality:** Checks expected feature groups (numeric, categorical, temporal, binary, discrete).
 - **Logic:** Verifies column presence per group and prints dtype diagnostics for each column.
 
 ![Data Type Analysis](ReadMe-Images/Data%20Type%20Analysis.png)
-
-*Figure 2: Type checks for the expected numeric, categorical, temporal, and binary columns.*
 
 3. **Feature Engineering (feature_engineering)**
 - **Functionality:** Creates additional features for time, weather, route context, and cyclic hour encoding.
@@ -200,15 +200,11 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Feature Engineering](ReadMe-Images/Feature%20Engineering.png)
 
-*Figure 3: Feature creation for route context, rush-hour flags, and cyclic time encoding.*
-
 4. **Data Cleaning (clean_data)**
 - **Functionality:** Handles missing values and prepares robust numeric features.
 - **Logic:** Fills numeric nulls with median values, reports selected-column IQR counts, and applies 1%-99% winsorization to `delay_min` and `speed_normal`.
 
 ![Data Cleaning](ReadMe-Images/Data%20Cleaning.png)
-
-*Figure 4: Cleaning summary showing imputation, outlier reporting, and winsorization.*
 
 5. **Categorical Encoding (encode_features)**
 - **Functionality:** Converts route text into model-ready binary indicators.
@@ -216,15 +212,11 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Categorical Encoding](ReadMe-Images/Categorical%20Encoding.png)
 
-*Figure 5: One-hot encoding of route categories into binary features.*
-
 6. **Column Pruning (drop_unused_columns)**
 - **Functionality:** Drops raw, non-model columns and leakage-prone fields.
 - **Logic:** Removes timestamp, origin, destination, route, hour, rain, and duration_traffic_min.
 
 ![Column Pruning](ReadMe-Images/Column%20Pruning.png)
-
-*Figure 6: Pruning of raw fields and leakage-prone columns before modeling.*
 
 7. **Target Creation (create_target)**
 - **Functionality:** Defines the prediction target based on selected ML task.
@@ -232,15 +224,11 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Target Creation](ReadMe-Images/Target%20Creation.png)
 
-*Figure 7: Target selection for regression or classification mode.*
-
 8. **Quality and Completeness (analyze_data_quality, profile_completeness)**
 - **Functionality:** Reports dataset quality after transformations.
 - **Logic:** Computes missing values, duplicates, quality score, and completeness metrics.
 
 ![Quality and Completeness](ReadMe-Images/Quality%20and%20Completeness.png)
-
-*Figure 8: Quality checks covering missing values, duplicates, and completeness.*
 
 9. **Terminal Report (print_full_terminal_report)**
 - **Functionality:** Generates a full end-of-pipeline textual summary.
@@ -252,7 +240,7 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Output Export](ReadMe-Images/Output%20Export.png)
 
-*Figure 9: Final export summary for the cleaned dataset and JSON report.*
+## Phase 2 - Outlier Analysis and Training
 
 11. **True Outlier Analysis (analyze_true_outliers)**
 - **Functionality:** Detects and classifies outliers before model training.
@@ -260,21 +248,11 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Outlier Detection](ReadMe-Images/Outlier.png)
 
-*Figure 10: Terminal summary for the true outlier analysis step.*
-![Outlier Analysis Terminal](ReadMe-Images/Phase%202%20-%20Outlier%20Analysis.png)
-
-*Figure 11: Screenshot of the terminal output for outlier classification and counts.*
-
 12. **Regression Experiments (evaluate_regression_outlier_experiments)**
 - **Functionality:** Compares model performance with outliers versus after removing suspicious/invalid rows.
 - **Logic:** Trains two Random Forest regressors on the same holdout split and exports comparison metrics plus a visualization.
 
 ![With vs Without Outliers](outputs/model_evaluation/metrics_with_vs_without_outliers.png)
-
-*Figure 12: Comparison of regression performance with and without outlier handling.*
-![Regression Experiments Terminal](ReadMe-Images/Phase%202%20-%20Model%20Experiments.png)
-
-*Figure 13: Terminal output for the with-vs-without outlier regression experiments.*
 
 13. **Final Regression Training (train_final_regression_model)**
 - **Functionality:** Trains the final regression model and exports the production-ready artifacts.
@@ -282,18 +260,21 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Final Model Evaluation](outputs/final_model/actual_vs_predicted.png)
 
-*Figure 14: Actual versus predicted delay values for the final weighted model.*
-![Final Training Terminal](ReadMe-Images/Phase%202%20-%20Final%20Model%20Training.png)
+14. **Dual-Model Experiment (modeling_pipeline.py)**
+- **Functionality:** Tests a post-cleaning experimental setup: baseline single model vs dual-model routing.
+- **Logic:**
+  - removes `invalid` rows
+  - creates `target_class` (`normal`=0, `valid/suspicious`=1)
+  - trains a classifier (contextual features only) for routing
+  - trains two regressors (normal vs extreme) on full regression features
+  - routes test predictions through the classifier and compares against single-model baseline
 
-*Figure 15: Terminal output for final weighted model training and artifact export.*
+Latest experimental run snapshot (`python modeling_pipeline.py`):
+- Baseline RF: MAE **0.3391**, RMSE **0.5498**, R² **0.9645**
+- Dual-model routing: MAE **0.3943**, RMSE **0.7219**, R² **0.9387**
+- Classifier quality (routing): Accuracy **0.9662**, Precision **0.8379**, Recall **0.7962**, F1 **0.8165**
 
-14. **Final ML Readiness Cleanup**
-- **Functionality:** Removes duplicate rows and zero-variance columns before the final export.
-- **Logic:** Confirms the final processed dataset is compact, duplicate-free, and ready for downstream use.
-
-![Final Cleanup Terminal](ReadMe-Images/Phase%202%20-%20Final%20Cleanup.png)
-
-*Figure 16: Terminal output for the final cleanup and readiness checks.*
+Interpretation: this experiment is valuable for analysis, but baseline single RandomForestRegressor remains stronger on current data.
 
 ### Plot Utility: [skewness_utils.py](skewness_utils.py)
 
@@ -306,8 +287,6 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 
 ![Skewness Analysis](ReadMe-Images/Skewness.png)
 
-*Figure 17: Skewness analysis and outlier diagnostics for selected numeric features.*
-
 ## Model Selection
 
 We selected **Random Forest Regressor** to predict `delay_min`.
@@ -316,7 +295,7 @@ We selected **Random Forest Regressor** to predict `delay_min`.
 
 **1. Non-Linear Relationships**
 The delay pattern across hours is clearly non-linear (negative at night, peak at midday).
-Linear Regression cannot capture this — Random Forest handles it naturally through splits.
+Linear Regression cannot capture this ΓÇö Random Forest handles it naturally through splits.
 
 **2. Moderate Correlations**
 The correlation matrix shows moderate signals (`temperature`: 0.57, `wind`: 0.54, `hour_cos`: -0.57).
@@ -327,7 +306,7 @@ IQR analysis confirmed outliers in `delay_min` and `distance_km`. Random Forest 
 threshold-based, so extreme values do not distort the model.
 
 **4. No Normalization Required**
-Unlike KNN or SVM, Random Forest does not depend on feature scale — making it a natural
+Unlike KNN or SVM, Random Forest does not depend on feature scale ΓÇö making it a natural
 fit for our mixed feature space (continuous, binary, and one-hot encoded columns).
 
 ## Technologies Used
@@ -388,9 +367,9 @@ From the latest generated report in [outputs/cleaned_report_regression.json](out
 
 ### Regression Experiment Summary
 
-- With outliers: MAE 0.2889, RMSE 0.5967, R² 0.9603
-- Without outliers: MAE 0.8240, RMSE 1.5581, R² 0.7290
-- Final weighted model: MAE 0.2972, RMSE 0.6019, R² 0.9596
+- With outliers: MAE 0.2889, RMSE 0.5967, R┬▓ 0.9603
+- Without outliers: MAE 0.8240, RMSE 1.5581, R┬▓ 0.7290
+- Final weighted model: MAE 0.2972, RMSE 0.6019, R┬▓ 0.9596
 
 Generated comparison and training artifacts:
 
