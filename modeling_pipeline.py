@@ -9,6 +9,8 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, mean_absolute_error, mean_squared_error, precision_score, r2_score, recall_score
 from sklearn.model_selection import train_test_split
 
+from alternative_algorithms import run_algorithm_comparison
+
 
 RANDOM_STATE = 42
 DATA_PATH = Path("outputs/cleaned_dataset_regression.csv")
@@ -380,6 +382,29 @@ def main() -> None:
     dual_result = train_dual_model(split_data)
 
     compare_models(baseline_result["metrics"], dual_result["metrics"])
+
+    # Run alternative algorithm comparison
+    print_section("ALTERNATIVE ALGORITHMS COMPARISON")
+    X_train = split_data["X_train"]
+    X_test = split_data["X_test"]
+    y_train = split_data["y_train"]
+    y_test = split_data["y_test"]
+    outlier_train = split_data["outlier_train"]
+
+    # Prepare sample weights for weighted training
+    sample_weight = np.ones(len(X_train), dtype=float)
+    if outlier_train is not None:
+        weight_map = {"normal": 1.0, "valid": 1.0, "suspicious": 0.65, "invalid": 0.35}
+        sample_weight = outlier_train.map(lambda x: weight_map.get(str(x), 1.0)).astype(float).to_numpy()
+
+    run_algorithm_comparison(
+        X_train=X_train,
+        X_test=X_test,
+        y_train=y_train,
+        y_test=y_test,
+        sample_weight=sample_weight,
+        output_dir=Path("outputs/algorithm_comparison"),
+    )
 
 
 if __name__ == "__main__":
