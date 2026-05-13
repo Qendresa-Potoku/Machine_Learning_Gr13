@@ -850,26 +850,6 @@ The project generates comprehensive outlier analysis visualizations to understan
 ![Feature Importance Top 15](outputs/final_model/feature_importance_top15.png)
 *Figure: Ranking of 15 most important features in the final trained model.*
 
-### Phase 3A - Hyperparameter Tuning Visualization
-
-#### GridSearchCV Results - 4-Panel Comparison
-![Hyperparameter Tuning Results](outputs/fine_tuning/tuning_results.png)
-*Figure 12: Comprehensive 4-panel visualization showing:*
-- *Metrics comparison (baseline vs tuned models)*
-- *Performance improvement percentages*
-- *Top 10 most important features from tuned model*
-- *Grid search RMSE convergence across parameter combinations*
-
-### Phase 3 - Model Optimization & Explainability
-
-#### Comprehensive Explainability Analysis
-![Model Explainability Analysis](outputs/model_optimization/explainability_analysis.png)
-*Figure 13: 4-component explainability visualization showing:*
-- *Feature importance ranking and distribution*
-- *Feature interaction strength (top 5 pairs)*
-- *Importance histogram for interpretability*
-- *Prediction uncertainty distribution across test samples*
-
 ### Output Files
 
 - Cleaned dataset: [outputs/cleaned_dataset_regression.csv](outputs/cleaned_dataset_regression.csv)
