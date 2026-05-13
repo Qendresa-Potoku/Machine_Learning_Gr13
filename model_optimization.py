@@ -10,6 +10,8 @@ from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend to avoid tkinter issues
 import matplotlib.pyplot as plt
 import pickle
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, VotingRegressor
@@ -218,7 +220,7 @@ class ModelOptimizer:
         """
         self._print_header("IMPROVEMENT 3: Advanced Regularization & Generalization")
         
-        print("\n🛡️ Applying stricter regularization for better generalization...")
+        print("\n Applying stricter regularization for better generalization...")
         
         # Baseline: Standard RandomForest
         rf_baseline = RandomForestRegressor(n_estimators=450, random_state=42, n_jobs=-1)
@@ -293,7 +295,7 @@ class ModelOptimizer:
         """
         self._print_header("MODEL EXPLAINABILITY ANALYSIS")
         
-        print("\n🔍 Analyzing model interpretability and decision patterns...\n")
+        print("\n Analyzing model interpretability and decision patterns...\n")
         
         # Train final model
         final_model = RandomForestRegressor(n_estimators=450, random_state=42, n_jobs=-1)
@@ -435,7 +437,7 @@ class ModelOptimizer:
         """
         self._print_header("MODEL OPTIMIZATION RESULTS COMPARISON")
         
-        print("\n📊 Comparing baseline vs optimized model performance...\n")
+        print("\n Comparing baseline vs optimized model performance...\n")
         
         comparison_df = pd.DataFrame({
             'Model': ['Baseline RandomForest', 'Optimized (Ensemble)'],
@@ -488,6 +490,14 @@ def run_model_optimization(
     Run complete model optimization workflow
     """
     optimizer = ModelOptimizer(output_dir)
+    
+    # Normalize baseline_metrics keys (convert lowercase to uppercase for consistency)
+    if baseline_metrics and 'mae' in baseline_metrics:
+        baseline_metrics = {
+            'MAE': baseline_metrics.get('mae', 0),
+            'RMSE': baseline_metrics.get('rmse', 0),
+            'R²': baseline_metrics.get('r2', 0),
+        }
     
     # Apply 3 improvements
     print("-" * 35)

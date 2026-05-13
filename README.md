@@ -501,7 +501,7 @@ We evaluated multiple supervised and unsupervised algorithms to predict traffic 
 
 **1. Non-Linear Relationships**
 The delay pattern across hours is clearly non-linear (negative at night, peak at midday).
-Linear Regression cannot capture this ΓÇö Random Forest handles it naturally through splits.
+Linear Regression cannot capture this Random Forest handles it naturally through splits.
 
 **2. Moderate Correlations**
 The correlation matrix shows moderate signals (`temperature`: 0.57, `wind`: 0.54, `hour_cos`: -0.57).
@@ -512,7 +512,7 @@ IQR analysis confirmed outliers in `delay_min` and `distance_km`. Random Forest 
 threshold-based, so extreme values do not distort the model.
 
 **4. No Normalization Required**
-Unlike KNN or SVM, Random Forest does not depend on feature scale ΓÇö making it a natural
+Unlike KNN or SVM, Random Forest does not depend on feature scale making it a natural
 fit for our mixed feature space (continuous, binary, and one-hot encoded columns).
 
 **5. Best Empirical Performance**
@@ -758,6 +758,68 @@ Generated plots:
 | :---: | :---: |
 | ![Hour Sin Distribution and Outliers](outputs/skewness_plots/hour_sin.png) | ![Hour Cos Distribution and Outliers](outputs/skewness_plots/hour_cos.png) |
 | *Figure 7: Histogram and boxplot for hour_sin.* | *Figure 8: Histogram and boxplot for hour_cos.* |
+
+### Phase 2 - Detailed Outlier Analysis Plots
+
+The project generates comprehensive outlier analysis visualizations to understand traffic anomalies:
+
+#### Outlier Type Distribution
+![Outlier Type Distribution](outputs/outlier_analysis/bar_outlier_type_counts.png)
+*Figure: Distribution of normal, valid, suspicious, and invalid traffic observations.*
+
+#### Delay Analysis for Outliers vs Normal
+![Delay Distribution: Outliers vs Normal](outputs/outlier_analysis/hist_delay_outliers_vs_normal.png)
+*Figure: Histogram comparing delay distributions for outlier and normal traffic patterns.*
+
+#### Delay vs Temperature (Scatter Plot)
+![Delay vs Temperature](outputs/outlier_analysis/scatter_delay_vs_temperature.png)
+*Figure: Relationship between temperature and traffic delay, showing weather impact on congestion.*
+
+#### Delay vs Speed (Scatter Plot)
+![Delay vs Speed](outputs/outlier_analysis/scatter_delay_vs_speed_normal.png)
+*Figure: Correlation between normal driving speed and delay magnitude.*
+
+#### Impact of Rush Hour on Delay (Boxplot)
+![Delay vs Rush Hour](outputs/outlier_analysis/boxplot_delay_vs_rush_hour.png)
+*Figure: Boxplot showing significant delay differences during rush hours vs normal periods.*
+
+#### Impact of Bad Weather on Delay (Boxplot)
+![Delay vs Bad Weather](outputs/outlier_analysis/boxplot_delay_vs_bad_weather.png)
+*Figure: Boxplot demonstrating weather's substantial impact on traffic delays.*
+
+#### Correlation Matrix - Full Dataset
+![Correlation Matrix (Full Dataset)](outputs/outlier_analysis/correlation_full_dataset.png)
+*Figure: Heatmap showing feature correlations in complete dataset.*
+
+#### Correlation Matrix - Outliers Only
+![Correlation Matrix (Outliers Only)](outputs/outlier_analysis/correlation_outliers_only.png)
+*Figure: Heatmap showing feature correlations within outlier subset, revealing different patterns.*
+
+### Phase 2 - Final Model Performance
+
+#### Feature Importance - Top 15 Features
+![Feature Importance Top 15](outputs/final_model/feature_importance_top15.png)
+*Figure: Ranking of 15 most important features in the final trained model.*
+
+### Phase 3A - Hyperparameter Tuning Visualization
+
+#### GridSearchCV Results - 4-Panel Comparison
+![Hyperparameter Tuning Results](outputs/fine_tuning/tuning_results.png)
+*Figure 12: Comprehensive 4-panel visualization showing:*
+- *Metrics comparison (baseline vs tuned models)*
+- *Performance improvement percentages*
+- *Top 10 most important features from tuned model*
+- *Grid search RMSE convergence across parameter combinations*
+
+### Phase 3 - Model Optimization & Explainability
+
+#### Comprehensive Explainability Analysis
+![Model Explainability Analysis](outputs/model_optimization/explainability_analysis.png)
+*Figure 13: 4-component explainability visualization showing:*
+- *Feature importance ranking and distribution*
+- *Feature interaction strength (top 5 pairs)*
+- *Importance histogram for interpretability*
+- *Prediction uncertainty distribution across test samples*
 
 ### Output Files
 
