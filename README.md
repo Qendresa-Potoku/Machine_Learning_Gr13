@@ -337,7 +337,7 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
   - Grid search results (RMSE across top parameter combinations)
 - Exports to [outputs/fine_tuning/tuning_results.png](outputs/fine_tuning/tuning_results.png)
 
-![Phase 3A Tuning Results](outputs/faza_iii/tuning_results.png)
+![Phase 3A Tuning Results](outputs/fine_tuning/tuning_results.png)
 
 ## Phase 3 Final - Advanced Enhancements
 
@@ -392,9 +392,9 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
    - Analyzes variance across internal trees
    - Identifies samples with highest prediction uncertainty
    - Provides interpretability into ensemble voting patterns
-   - Exports comprehensive 4-panel visualization to [outputs/phase3_final/explainability_analysis.png](outputs/phase3_final/explainability_analysis.png)
+   - Exports comprehensive 4-panel visualization to [outputs/model_optimization/explainability_report.csv](outputs/model_optimization/explainability_report.csv)
 
-![Phase 3 Final Explainability Analysis](outputs/faza_iii/explainability_analysis.png)
+![Phase 3 Final Explainability Analysis](outputs/model_optimization/explainability_report.csv)
 
 ### Results Comparison: Phase 1 → Phase 2 → Phase 3
 
@@ -634,6 +634,8 @@ Visual comparison:
 
 **RandomForest Hyperparameter Optimization using GridSearchCV:**
 
+![Phase 3A Tuning Results](outputs/fine_tuning/tuning_results.png)
+
 Grid Search Configuration:
 - **Parameter Space:** 18 combinations tested
   - n_estimators: [450, 600, 800]
@@ -723,7 +725,7 @@ Visualization: [outputs/phase3_final/phase_comparison.png](outputs/phase3_final/
 
 The Phase 3 final enhancements include a comprehensive 4-component explainability visualization that provides deep insights into model decision-making:
 
-![Phase 3 Model Explainability Analysis](outputs/faza_iii/explainability_analysis.png)
+![Phase 3 Model Explainability Analysis](outputs/model_optimization/explainability_report.csv)
 
 *Figure 13: 4-component explainability visualization showing:*
 - **Feature Importance Ranking and Distribution** - Identifies which traffic factors most strongly influence delay predictions
@@ -735,7 +737,7 @@ The Phase 3 final enhancements include a comprehensive 4-component explainabilit
 
 The GridSearchCV hyperparameter tuning process generated a comprehensive 4-panel visualization:
 
-![Phase 3A Tuning Results](outputs/faza_iii/tuning_results.png)
+![Phase 3A Tuning Results](outputs/fine_tuning/tuning_results.png)
 
 *Figure 12: GridSearchCV optimization results showing:*
 - Baseline vs tuned model metrics comparison
