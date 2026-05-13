@@ -11,11 +11,10 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Optional
+import warnings
 
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend to avoid tkinter issues
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -30,6 +29,10 @@ try:
     LIGHTGBM_AVAILABLE = True
 except ImportError:
     LIGHTGBM_AVAILABLE = False
+
+# Suppress feature name warnings (intentionally using numpy arrays)
+warnings.filterwarnings("ignore", message=".*X does not have valid feature names.*")
+warnings.filterwarnings("ignore", message=".*X has feature names.*")
 
 
 class AlgorithmComparison:

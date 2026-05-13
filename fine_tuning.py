@@ -10,8 +10,6 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend to avoid tkinter issues
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV, cross_val_score
@@ -71,13 +69,15 @@ class RandomForestTuner:
         cv_scores = cross_val_score(
             baseline_model, X_train, y_train, cv=5, scoring="neg_mean_squared_error"
         )
-        cv_rmse = np.sqrt(-cv_scores.mean())
+        cv_rmse_scores = np.sqrt(-cv_scores)
+        cv_rmse_mean = cv_rmse_scores.mean()
+        cv_rmse_std = cv_rmse_scores.std()
 
         print(f"Test RMSE:     {metrics['RMSE']:.4f} minutes")
         print(f"Test MAE:      {metrics['MAE']:.4f} minutes")
         print(f"Test R²:       {metrics['R2']:.4f}")
-        print(f"CV RMSE (5x):  {cv_rmse:.4f} minutes (mean ± std)")
-        print(f"CV std dev:    {np.sqrt(-cv_scores.std()):.4f}")
+        print(f"CV RMSE (5x):  {cv_rmse_mean:.4f} minutes (mean ± std)")
+        print(f"CV std dev:    {cv_rmse_std:.4f}")
 
         self.baseline_metrics = metrics
         return metrics
@@ -158,13 +158,15 @@ class RandomForestTuner:
         cv_scores = cross_val_score(
             self.best_model, X_train, y_train, cv=5, scoring="neg_mean_squared_error"
         )
-        cv_rmse = np.sqrt(-cv_scores.mean())
+        cv_rmse_scores = np.sqrt(-cv_scores)
+        cv_rmse_mean = cv_rmse_scores.mean()
+        cv_rmse_std = cv_rmse_scores.std()
 
         print(f"Test RMSE:     {metrics['RMSE']:.4f} minutes")
         print(f"Test MAE:      {metrics['MAE']:.4f} minutes")
         print(f"Test R²:       {metrics['R2']:.4f}")
-        print(f"CV RMSE (5x):  {cv_rmse:.4f} minutes")
-        print(f"CV std dev:    {np.sqrt(-cv_scores.std()):.4f}")
+        print(f"CV RMSE (5x):  {cv_rmse_mean:.4f} minutes")
+        print(f"CV std dev:    {cv_rmse_std:.4f}")
 
         self.tuned_metrics = metrics
         return metrics

@@ -161,18 +161,18 @@ def evaluate_predictions(y_true: pd.Series, y_pred: np.ndarray) -> dict[str, flo
     r2 = r2_score(y_true, y_pred)
 
     return {
-        "mae": float(mae),
-        "rmse": rmse,
-        "r2": float(r2),
+        "MAE": float(mae),
+        "RMSE": rmse,
+        "R²": float(r2),
     }
 
 
 def print_metrics(title: str, metrics: dict[str, float], row_count: int | None = None) -> None:
     suffix = f" ({row_count:,} rows)" if row_count is not None else ""
     print(f"\n{title}{suffix}")
-    print(f"  MAE : {metrics['mae']:.4f}")
-    print(f"  RMSE: {metrics['rmse']:.4f}")
-    print(f"  R²  : {metrics['r2']:.4f}")
+    print(f"  MAE : {metrics['MAE']:.4f}")
+    print(f"  RMSE: {metrics['RMSE']:.4f}")
+    print(f"  R²  : {metrics['R²']:.4f}")
 
 
 def evaluate_by_outlier_type(model: RandomForestRegressor, X_test: pd.DataFrame, y_test: pd.Series, outlier_test: pd.Series) -> dict[str, dict[str, float]]:
@@ -357,9 +357,9 @@ def compare_models(baseline_metrics: dict[str, float], dual_metrics: dict[str, f
 
     print(comparison.to_string(index=False, float_format=lambda value: f"{value:.4f}"))
 
-    mae_delta = baseline_metrics["mae"] - dual_metrics["mae"]
-    rmse_delta = baseline_metrics["rmse"] - dual_metrics["rmse"]
-    r2_delta = dual_metrics["r2"] - baseline_metrics["r2"]
+    mae_delta = baseline_metrics["MAE"] - dual_metrics["MAE"]
+    rmse_delta = baseline_metrics["RMSE"] - dual_metrics["RMSE"]
+    r2_delta = dual_metrics["R²"] - baseline_metrics["R²"]
 
     print("\nImprovement vs baseline:")
     print(f"  MAE  improvement: {mae_delta:.4f}")

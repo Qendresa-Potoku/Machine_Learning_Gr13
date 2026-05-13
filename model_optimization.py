@@ -7,11 +7,10 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Optional, Tuple
+import warnings
 
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend to avoid tkinter issues
 import matplotlib.pyplot as plt
 import pickle
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, VotingRegressor
@@ -19,6 +18,10 @@ from sklearn.feature_selection import SelectKBest, f_regression
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
 import seaborn as sns
+
+# Suppress feature name warnings (intentionally using numpy arrays in some contexts)
+warnings.filterwarnings("ignore", message=".*X does not have valid feature names.*")
+warnings.filterwarnings("ignore", message=".*X has feature names.*")
 
 
 class ModelOptimizer:
@@ -490,14 +493,6 @@ def run_model_optimization(
     Run complete model optimization workflow
     """
     optimizer = ModelOptimizer(output_dir)
-    
-    # Normalize baseline_metrics keys (convert lowercase to uppercase for consistency)
-    if baseline_metrics and 'mae' in baseline_metrics:
-        baseline_metrics = {
-            'MAE': baseline_metrics.get('mae', 0),
-            'RMSE': baseline_metrics.get('rmse', 0),
-            'R²': baseline_metrics.get('r2', 0),
-        }
     
     # Apply 3 improvements
     print("-" * 35)
