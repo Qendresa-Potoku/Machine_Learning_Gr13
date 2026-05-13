@@ -35,6 +35,7 @@
 - [Repository Structure](#repository-structure)
 - [Dataset Description](#dataset-description)
 - [Implemented Modules](#implemented-modules)
+- [Model Selection and Algorithm Comparison](#model-selection-and-algorithm-comparison)
 - [Technologies Used](#technologies-used)
 - [Installation & Setup](#installation--setup)
 - [Results](#results)
@@ -291,11 +292,87 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
 
 ![Skewness Analysis](ReadMe-Images/Skewness.png)
 
-## Model Selection
+### Algorithm Comparison: [alternative_algorithms.py](alternative_algorithms.py)
 
-We selected **Random Forest Regressor** to predict `delay_min`.
+`AlgorithmComparison` class with 4 sequential steps:
 
-### Justification
+**STEP 1: Independent Algorithm Testing**
+- Trains 4 supervised algorithms on original data
+- Algorithms: RandomForest, LightGBM, SVR, KNN
+- Evaluates using MAE, RMSE, and R² metrics
+- Exports results to [outputs/algorithm_comparison/algorithms_before_clusters.csv](outputs/algorithm_comparison/algorithms_before_clusters.csv)
+
+**STEP 2: Discover Traffic Patterns with K-Means**
+- Uses unsupervised K-Means clustering (5 clusters by default)
+- Identifies natural traffic pattern groups in training data
+- Analyzes cluster sizes and characteristics
+
+**STEP 3: Retrain with Cluster Features**
+- Adds discovered cluster feature to training data
+- Retrains all 4 supervised algorithms with enhanced features
+- Evaluates performance improvements
+- Exports results to [outputs/algorithm_comparison/algorithms_after_clusters.csv](outputs/algorithm_comparison/algorithms_after_clusters.csv)
+
+**STEP 4: Generate Comparison Report**
+- Calculates performance improvement metrics
+- Creates side-by-side visualization of before/after results
+- Exports comparison plot to [outputs/algorithm_comparison/algorithm_comparison.png](outputs/algorithm_comparison/algorithm_comparison.png)
+
+## Model Selection and Algorithm Comparison
+
+### Algorithms Tested
+
+We evaluated multiple supervised and unsupervised algorithms to predict traffic delays:
+
+#### Supervised Learning Algorithms
+
+| Algorithm | Type | Description |
+|---|---|---|
+| **RandomForest** | Tree Ensemble | Baseline model; handles non-linear relationships well |
+| **LightGBM** | Gradient Boosting | Advanced ensemble with fast training and strong performance |
+| **SVR** | Support Vector Regression | Non-linear kernel-based regression with feature scaling |
+| **KNN** | Distance-based | Instance-based method using k nearest neighbors |
+
+#### Unsupervised Learning Algorithm
+
+| Algorithm | Type | Description |
+|---|---|---|
+| **K-Means** | Clustering | Discovers traffic patterns; used to enhance feature space |
+
+### Performance Comparison Results
+
+#### Before K-Means Clustering
+
+| Algorithm | MAE | RMSE | R² |
+|---|---|---|---|
+| **RandomForest** | 0.3386 | 0.5483 | 0.9646 |
+| LightGBM | 0.3974 | 0.5947 | 0.9584 |
+| KNN | 0.3920 | 0.6705 | 0.9471 |
+| SVR | 0.5960 | 0.7772 | 0.9290 |
+
+#### After K-Means Clustering (with cluster feature)
+
+| Algorithm | MAE | RMSE | R² |
+|---|---|---|---|
+| **RandomForest** | 0.3382 | 0.5482 | 0.9647 |
+| LightGBM | 0.4001 | 0.5996 | 0.9577 |
+| KNN | 0.3941 | 0.6741 | 0.9466 |
+| SVR | 0.5942 | 0.7798 | 0.9285 |
+
+**Visualization of Algorithm Performance:**
+
+![Algorithm Comparison](outputs/algorithm_comparison/algorithm_comparison.png)
+*Figure 11: Comparison of supervised algorithms before and after K-Means clustering enhancement.*
+
+### Algorithm Comparison Analysis
+
+1. **RandomForest remains the best performer** with the lowest RMSE (0.5483) and highest R² (0.9646)
+2. **K-Means clustering** adds minimal improvement but maintains stability across all algorithms
+3. **LightGBM shows competitive performance** but slightly higher error than RandomForest
+4. **SVR underperforms** without feature scaling and has higher RMSE, likely due to the RBF kernel
+5. **KNN performs well** but benefits less from clustering compared to tree-based models
+
+### Why We Selected RandomForest
 
 **1. Non-Linear Relationships**
 The delay pattern across hours is clearly non-linear (negative at night, peak at midday).
@@ -312,6 +389,9 @@ threshold-based, so extreme values do not distort the model.
 **4. No Normalization Required**
 Unlike KNN or SVM, Random Forest does not depend on feature scale ΓÇö making it a natural
 fit for our mixed feature space (continuous, binary, and one-hot encoded columns).
+
+**5. Best Empirical Performance**
+Our algorithm comparison definitively shows RandomForest outperforms all other tested algorithms on this traffic dataset.
 
 ## Technologies Used
 
@@ -381,6 +461,39 @@ Generated comparison and training artifacts:
 | :---: | :---: |
 | ![With vs Without Outliers](outputs/model_evaluation/metrics_with_vs_without_outliers.png) | ![Actual vs Predicted](outputs/final_model/actual_vs_predicted.png) |
 | *Figure 9: Comparison of regression performance with and without outlier handling.* | *Figure 10: Actual vs predicted delay for the final weighted model.* |
+
+### Algorithm Comparison Summary
+
+**Independent Algorithm Performance (Before K-Means Clustering)**
+
+| Algorithm | MAE | RMSE | R² | Status |
+|---|---|---|---|---|
+| RandomForest | 0.3386 | 0.5483 | 0.9646 | **✓ BEST** |
+| LightGBM | 0.3974 | 0.5947 | 0.9584 | Strong |
+| KNN | 0.3920 | 0.6705 | 0.9471 | Good |
+| SVR | 0.5960 | 0.7772 | 0.9290 | Fair |
+
+**Performance After K-Means Clustering (with cluster feature)**
+
+| Algorithm | MAE | RMSE | R² | Improvement |
+|---|---|---|---|---|
+| RandomForest | 0.3382 | 0.5482 | 0.9647 | +0.02% stability |
+| LightGBM | 0.4001 | 0.5996 | 0.9577 | -0.7% (slight increase) |
+| KNN | 0.3941 | 0.6741 | 0.9466 | -0.5% (slight increase) |
+| SVR | 0.5942 | 0.7798 | 0.9285 | -0.5% (slight increase) |
+
+**Key Findings:**
+- RandomForest maintains best performance with minimal variation
+- K-Means clustering provides negligible improvement for this dataset
+- All algorithms show strong predictive power (R² > 0.92)
+- Distance-based algorithms (KNN, SVR) are robust to cluster features
+
+Visual comparison:
+
+| **Algorithm Comparison** |
+| :---: |
+| ![Algorithm Comparison](outputs/algorithm_comparison/algorithm_comparison.png) |
+| *Figure 11: Side-by-side comparison of supervised algorithms before and after K-Means clustering enhancement.* |
 
 ### Cleaning Summary
 
