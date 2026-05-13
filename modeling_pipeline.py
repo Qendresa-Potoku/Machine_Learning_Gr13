@@ -10,6 +10,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, mean_abs
 from sklearn.model_selection import train_test_split
 
 from alternative_algorithms import run_algorithm_comparison
+from fine_tuning import run_phase3a_hyperparameter_tuning
 
 
 RANDOM_STATE = 42
@@ -404,6 +405,17 @@ def main() -> None:
         y_test=y_test,
         sample_weight=sample_weight,
         output_dir=Path("outputs/algorithm_comparison"),
+    )
+
+    # Run Phase 3A: Hyperparameter Tuning
+    print_section("PHASE 3A: HYPERPARAMETER TUNING")
+    tuned_model, best_params = run_phase3a_hyperparameter_tuning(
+        X_train=X_train,
+        X_test=X_test,
+        y_train=y_train,
+        y_test=y_test,
+        sample_weight=sample_weight,
+        output_dir=Path("outputs/fine_tuning"),
     )
 
 
