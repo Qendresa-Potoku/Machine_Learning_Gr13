@@ -109,7 +109,7 @@ class AlgorithmComparison:
             results["LightGBM"] = self._calculate_metrics(y_test, lgb_pred)
             models["LightGBM"] = lgb_model
         else:
-            print("  ⚠ LightGBM not available (install: pip install lightgbm)")
+            print("LightGBM not available (install: pip install lightgbm)")
 
         # SVR (requires scaling)
         print("  Training SVR...")

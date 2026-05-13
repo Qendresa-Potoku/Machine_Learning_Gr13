@@ -11,6 +11,7 @@ from sklearn.model_selection import train_test_split
 
 from alternative_algorithms import run_algorithm_comparison
 from fine_tuning import run_phase3a_hyperparameter_tuning
+from model_optimization import run_model_optimization
 
 
 RANDOM_STATE = 42
@@ -409,14 +410,39 @@ def main() -> None:
 
     # Run Phase 3A: Hyperparameter Tuning
     print_section("PHASE 3A: HYPERPARAMETER TUNING")
-    tuned_model, best_params = run_phase3a_hyperparameter_tuning(
-        X_train=X_train,
-        X_test=X_test,
-        y_train=y_train,
-        y_test=y_test,
-        sample_weight=sample_weight,
-        output_dir=Path("outputs/fine_tuning"),
-    )
+    try:
+        tuned_model, best_params = run_phase3a_hyperparameter_tuning(
+            X_train=X_train,
+            X_test=X_test,
+            y_train=y_train,
+            y_test=y_test,
+            sample_weight=sample_weight,
+            output_dir=Path("outputs/fine_tuning"),
+        )
+        print("Phase 3A completed successfully")
+    except Exception as e:
+        print(f"Phase 3A encountered an error: {e}")
+        import traceback
+        traceback.print_exc()
+        tuned_model, best_params = None, None
+
+    # Run Model Optimization: Advanced Enhancements & Explainability
+    print_section("MODEL OPTIMIZATION: ADVANCED ENHANCEMENTS")
+    try:
+        optimized_metrics, optimization_comparison = run_model_optimization(
+            X_train=X_train,
+            X_test=X_test,
+            y_train=y_train,
+            y_test=y_test,
+            baseline_metrics=baseline_result["metrics"],
+            sample_weight=sample_weight,
+            output_dir=Path("outputs/model_optimization"),
+        )
+        print(f"\nModel optimization complete. Results saved to outputs/model_optimization/")
+    except Exception as e:
+        print(f"Model optimization encountered an error: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 if __name__ == "__main__":
