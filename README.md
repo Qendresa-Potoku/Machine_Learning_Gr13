@@ -337,6 +337,8 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
   - Grid search results (RMSE across top parameter combinations)
 - Exports to [outputs/fine_tuning/tuning_results.png](outputs/fine_tuning/tuning_results.png)
 
+![Phase 3A Tuning Results](outputs/faza_iii/tuning_results.png)
+
 ## Phase 3 Final - Advanced Enhancements
 
 16. **Advanced Model Improvements (phase3_final_enhancements.py)**
@@ -391,6 +393,8 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
    - Identifies samples with highest prediction uncertainty
    - Provides interpretability into ensemble voting patterns
    - Exports comprehensive 4-panel visualization to [outputs/phase3_final/explainability_analysis.png](outputs/phase3_final/explainability_analysis.png)
+
+![Phase 3 Final Explainability Analysis](outputs/faza_iii/explainability_analysis.png)
 
 ### Results Comparison: Phase 1 → Phase 2 → Phase 3
 
