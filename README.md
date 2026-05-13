@@ -322,12 +322,11 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
 **STEP 4: Compare Baseline vs Tuned**
 - Creates side-by-side metrics comparison
 - Calculates percentage improvements in MAE, RMSE, R²
-- Exports comparison to [outputs/fine_tuning/baseline_vs_tuned.csv](outputs/fine_tuning/baseline_vs_tuned.csv)
+- Stores comparison metrics in memory
 
 **STEP 5: Save Artifacts**
 - Exports tuned model to [outputs/fine_tuning/tuned_random_forest_model.pkl](outputs/fine_tuning/tuned_random_forest_model.pkl)
-- Saves best hyperparameters to [outputs/fine_tuning/best_hyperparameters.csv](outputs/fine_tuning/best_hyperparameters.csv)
-- Saves top 10 feature importances to [outputs/fine_tuning/feature_importance_tuned.csv](outputs/fine_tuning/feature_importance_tuned.csv)
+- Feature importances included in visualization
 
 **STEP 6: Generate Visualizations**
 - Creates 4-panel comparison visualization:
@@ -352,20 +351,19 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
 - **Method:** Univariate statistical selection keeping top 70% of features
 - **Benefit:** Faster inference, reduced memory footprint, enhanced model clarity
 - **Output:** Selected features list with performance comparison
-- Exports to [outputs/phase3_final/](outputs/phase3_final/)
 
 **IMPROVEMENT 2: Ensemble Voting Regressor**
 - **Rationale:** Combine multiple algorithms (Random Forest + Gradient Boosting) to leverage strengths
 - **Method:** Equal-weight voting regressor combining RF (high variance) and GB (high bias)
 - **Benefit:** Reduced variance, improved robustness, reduced overfitting risk
-- **Exported Model:** [outputs/phase3_final/ensemble_voting_model.pkl](outputs/phase3_final/ensemble_voting_model.pkl)
+- **Exported Model:** [outputs/model_optimization/ensemble_voting_model.pkl](outputs/model_optimization/ensemble_voting_model.pkl)
 - **Key Insight:** Combining tree-based ensembles reduces individual model weaknesses
 
 **IMPROVEMENT 3: Advanced Regularization**
 - **Rationale:** Prevent overfitting with stricter regularization for better generalization
 - **Method:** Stricter hyperparameters (max_depth=15, min_samples_split=10, min_samples_leaf=5)
 - **Benefit:** Improved test-set performance, better cross-validation stability
-- **Exported Model:** [outputs/phase3_final/regularized_random_forest_model.pkl](outputs/phase3_final/regularized_random_forest_model.pkl)
+- **Exported Model:** [outputs/model_optimization/regularized_random_forest_model.pkl](outputs/model_optimization/regularized_random_forest_model.pkl)
 - **Key Insight:** Deeper regularization reduces overfitting on complex feature interactions
 
 ### Unique Contribution: Model Explainability Analysis
@@ -375,7 +373,7 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
 1. **Feature Importance Ranking**
    - Identifies and ranks top 10 most predictive features
    - Visualizes contribution of each feature to predictions
-   - Exported to [outputs/phase3_final/explainability_report.csv](outputs/phase3_final/explainability_report.csv)
+   - Analyzed via tuning results visualization
 
 2. **Prediction Confidence & Uncertainty**
    - Calculates model confidence score (0-1 scale)
@@ -392,9 +390,6 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
    - Analyzes variance across internal trees
    - Identifies samples with highest prediction uncertainty
    - Provides interpretability into ensemble voting patterns
-   - Exports comprehensive 4-panel visualization to [outputs/model_optimization/explainability_report.csv](outputs/model_optimization/explainability_report.csv)
-
-![Phase 3 Final Explainability Analysis](outputs/model_optimization/explainability_report.csv)
 
 ### Results Comparison: Phase 1 → Phase 2 → Phase 3
 
@@ -402,8 +397,6 @@ Interpretation: this experiment is valuable for analysis, but baseline single Ra
 - Side-by-side metrics comparison (MAE, RMSE, R²)
 - Tracks performance progression across all phases
 - Shows cumulative improvements from each phase
-- Visualized in [outputs/phase3_final/phase_comparison.png](outputs/phase3_final/phase_comparison.png)
-- Exported to [outputs/phase3_final/phase_comparison.csv](outputs/phase3_final/phase_comparison.csv)
 
 **Key Comparison Dimensions:**
 - **Phase 1 (Baseline):** Direct regression with outlier handling
@@ -651,9 +644,7 @@ Grid Search Configuration:
 - Feature importance analysis reveals top 10 predictive features in traffic delay prediction
 
 **Tuning Artifacts Generated:**
-- Model comparison: [outputs/fine_tuning/baseline_vs_tuned.csv](outputs/fine_tuning/baseline_vs_tuned.csv)
 - Optimized model: [outputs/fine_tuning/tuned_random_forest_model.pkl](outputs/fine_tuning/tuned_random_forest_model.pkl)
-- Feature importances: [outputs/fine_tuning/feature_importance_tuned.csv](outputs/fine_tuning/feature_importance_tuned.csv)
 - 4-panel visualization: [outputs/fine_tuning/tuning_results.png](outputs/fine_tuning/tuning_results.png)
   - Metrics comparison (baseline vs tuned)
   - Performance improvement percentages
@@ -668,19 +659,18 @@ Grid Search Configuration:
    - Reduced feature dimensionality by ~30% while maintaining performance
    - Kept only top 70% of most predictive features
    - Result: Improved model interpretability and faster inference
-   - Comparison: [outputs/phase3_final/phase_comparison.csv](outputs/phase3_final/phase_comparison.csv)
 
 2. **Ensemble Voting Regressor**
    - Combined RandomForest (high variance learner) + GradientBoosting (high bias learner)
    - Voting mechanism averages predictions from both models
    - Result: Reduced variance, improved robustness to outliers
-   - Model Export: [outputs/phase3_final/ensemble_voting_model.pkl](outputs/phase3_final/ensemble_voting_model.pkl)
+   - Model Export: [outputs/model_optimization/ensemble_voting_model.pkl](outputs/model_optimization/ensemble_voting_model.pkl)
 
 3. **Advanced Regularization**
    - Applied stricter hyperparameters (deeper max_depth=15, larger min_samples_leaf=5)
    - Increased cross-validation folds from 3 to 5 for stability assessment
    - Result: Better generalization to unseen data, reduced overfitting
-   - Model Export: [outputs/phase3_final/regularized_random_forest_model.pkl](outputs/phase3_final/regularized_random_forest_model.pkl)
+   - Model Export: [outputs/model_optimization/regularized_random_forest_model.pkl](outputs/model_optimization/regularized_random_forest_model.pkl)
 
 **Unique Contribution: Model Explainability**
 
@@ -691,12 +681,10 @@ Implemented comprehensive interpretability analysis revealing:
 - **Model Behavior Patterns:** Analyzed inter-tree variance and identified high-uncertainty predictions
 
 Artifacts:
-- Feature importance report: [outputs/phase3_final/explainability_report.csv](outputs/phase3_final/explainability_report.csv)
-- 4-panel visualization: [outputs/phase3_final/explainability_analysis.png](outputs/phase3_final/explainability_analysis.png)
+- Tuning visualization: [outputs/fine_tuning/tuning_results.png](outputs/fine_tuning/tuning_results.png)
   - Feature importance distribution
-  - Feature interaction strength
-  - Importance histogram
-  - Prediction uncertainty distribution
+  - Model metrics comparison
+  - Prediction performance analysis
 
 **Cross-Phase Performance Comparison:**
 
@@ -706,15 +694,6 @@ Artifacts:
 | **Phase 2** | Weighted Regression | Outlier-aware sample weighting | Improved stability, R² ~0.96 |
 | **Phase 3** | Ensemble Optimized | Combined improvements + regularization | Best generalization, reduced overfitting |
 
-Visualization: [outputs/phase3_final/phase_comparison.png](outputs/phase3_final/phase_comparison.png)
-- Bar charts showing MAE, RMSE, R² progression
-- Trend analysis across phases
-- Overall improvement metrics
-
-**Improvements Summary Report:**
-- Comprehensive improvements tracking: [outputs/phase3_final/improvements_summary.csv](outputs/phase3_final/improvements_summary.csv)
-- Documents rationale and results for each enhancement
-
 ---
 
 ## Phase 3 - Model Optimization & Explainability
@@ -723,15 +702,7 @@ Visualization: [outputs/phase3_final/phase_comparison.png](outputs/phase3_final/
 
 **Model Explainability Analysis**
 
-The Phase 3 final enhancements include a comprehensive 4-component explainability visualization that provides deep insights into model decision-making:
-
-![Phase 3 Model Explainability Analysis](outputs/model_optimization/explainability_report.csv)
-
-*Figure 13: 4-component explainability visualization showing:*
-- **Feature Importance Ranking and Distribution** - Identifies which traffic factors most strongly influence delay predictions
-- **Feature Interaction Strength (Top 5 Pairs)** - Reveals synergistic effects between important features
-- **Importance Histogram for Interpretability** - Visualizes the distribution and relative contribution of features
-- **Prediction Uncertainty Distribution** - Displays model confidence levels across test samples
+The hyperparameter tuning process reveals deep insights into model decision-making through the GridSearchCV results and feature importance analysis.
 
 ### Phase 3A - Hyperparameter Tuning Visualization
 
@@ -750,13 +721,10 @@ The GridSearchCV hyperparameter tuning process generated a comprehensive 4-panel
 **Key Phase 3 Artifacts:**
 - Cleaned dataset: [outputs/cleaned_dataset_regression.csv](outputs/cleaned_dataset_regression.csv)
 - Detailed processing report: [outputs/cleaned_report_regression.json](outputs/cleaned_report_regression.json)
-- Explainability report: [outputs/phase3_final/explainability_report.csv](outputs/phase3_final/explainability_report.csv)
-- Ensemble voting model: [outputs/phase3_final/ensemble_voting_model.pkl](outputs/phase3_final/ensemble_voting_model.pkl)
-- Regularized model: [outputs/phase3_final/regularized_random_forest_model.pkl](outputs/phase3_final/regularized_random_forest_model.pkl)
+- Ensemble voting model: [outputs/model_optimization/ensemble_voting_model.pkl](outputs/model_optimization/ensemble_voting_model.pkl)
+- Regularized model: [outputs/model_optimization/regularized_random_forest_model.pkl](outputs/model_optimization/regularized_random_forest_model.pkl)
 - Tuned model: [outputs/fine_tuning/tuned_random_forest_model.pkl](outputs/fine_tuning/tuned_random_forest_model.pkl)
-- Tuning comparison: [outputs/fine_tuning/baseline_vs_tuned.csv](outputs/fine_tuning/baseline_vs_tuned.csv)
-- Improvements summary: [outputs/phase3_final/improvements_summary.csv](outputs/phase3_final/improvements_summary.csv)
-- Optimization comparison: [outputs/phase3_final/optimization_comparison.csv](outputs/phase3_final/optimization_comparison.csv)
+- Tuning visualization: [outputs/fine_tuning/tuning_results.png](outputs/fine_tuning/tuning_results.png)
 
 ---
 

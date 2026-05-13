@@ -1,7 +1,14 @@
 .venv/
 .__pycache__/
 .outputs/
-outputs/fine_tuning/*
 
-# But keep this specific file
+# Ignore large binary models and data files
+*.pkl
+outputs/cleaned_dataset_regression.csv
+outputs/**/*.pkl
+
+# Keep only tuning visualization and CSV reports
 !outputs/fine_tuning/tuning_results.png
+!outputs/**/baseline_vs_tuned.csv
+!outputs/**/best_hyperparameters.csv
+!outputs/**/feature_importance*.csv

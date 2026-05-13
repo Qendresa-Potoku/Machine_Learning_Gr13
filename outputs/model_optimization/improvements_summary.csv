@@ -1,0 +1,4 @@
+Improvement,Rationale,Result
+Feature Selection (SelectKBest),"Reduce complexity, improve interpretability, reduce overfitting",Kept top 43 features; R² change: +0.04%
+Ensemble Voting,Combine multiple algorithms to reduce variance and leverage model strengths,"RMSE: -9.68%, R²: -0.74%"
+Advanced Regularization,Prevent overfitting with stricter constraints for better generalization,"Test R²: -3.34%, CV Stability improved"
