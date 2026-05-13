@@ -155,35 +155,35 @@ Based on local traffic patterns in Prishtina, we have adjusted the definition of
 
 ### Traffic Delay by Hour
 ![Traffic Delay by Hour](outputs/visualizations/delay_vs_hour.png)
-*Shows the impact of time on traffic delay, highlighting the morning and evening rush hours.*
+*Figure 1: Traffic delay by hour, showing morning and evening rush hour patterns.*
 
 **Analysis Conclusion:**
 The chart confirms that the time of day plays a massive role in traffic delays, which heavily justifies using features like `hour` and `is_rush_hour`. We can clearly see "negative" delays at night (meaning empty roads where cars move faster than expected), a sharp jump during the morning rush, and a surprising peak around lunchtime (13:00). Paradoxically, delays seem to drop during the evening rush (16:00-18:00), which is unexpected and might point to a quirk in how the data was collected or a specific local anomaly.
 
 ### Delay vs Distance
 ![Delay vs Distance](outputs/visualizations/delay_vs_distance.png)
-*Correlation between distance and delay.*
+*Figure 2: Relationship between route distance and traffic delay.*
 
 **Analysis Conclusion:**
 This plot helps us check if longer trips automatically mean longer delays. It appears that distance alone is not the only factor - traffic congestion impacts both short and long trips, suggesting that *where* you are driving matters just as much as *how far* you are going.
 
 ### Top Routes by Delay
 ![Top Routes by Delay](outputs/visualizations/top_routes_delay.png)
-*Routes with the highest average delays.*
+*Figure 3: Routes with the highest average traffic delays in Prishtina.*
 
 **Analysis Conclusion:**
 As expected, the route from **G├½rmia Park to Prishtina Center** is the most congested, with an average delay of about 1.6 minutes. Other major central routes like **Grand Prishtina Mall ΓåÆ Ulpiana** also show up near the top. However, the difference between the worst route and the others isn't huge, suggesting that while specific hotspots exist, delays are fairly distributed across the city's main arteries.
 
 ### Delay: Weekend vs Weekday
 ![Weekend vs Weekday](outputs/visualizations/delay_weekend_vs_weekday.png)
-*Comparison of traffic delays between weekends and weekdays.*
+*Figure 4: Traffic delay comparison between weekends and weekdays.*
 
 **Analysis Conclusion:**
 This comparison clearly shows why the `is_weekend` feature is so important. Weekdays are much more chaotic, with a wider range of delays and lots of extreme outliers (some up to 24 minutes!). Weekends, on the other hand, are calm and predictable, with most cars actually arriving faster than average. The difference is night and day, confirming that the day of the week is a key driver for our model.
 
 ### Feature Correlation Matrix
 ![Feature Correlation](outputs/visualizations/correlation_matrix.png)
-*Heatmap showing the correlation strength between numeric features.*
+*Figure 5: Heatmap showing correlation strength between numeric features.*
 
 **Analysis Conclusion:**
 The correlation matrix reveals several key relationships that inform our model selection:
@@ -203,48 +203,56 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 - **Logic:** Uses interactive input and reproducible random sampling when sample mode is selected.
 
 ![Dataset Scope Selection](ReadMe-Images/Dataset%20Scope%20Selection.png)
+*Figure 6: Dataset scope selection interface.*
 
 2. **Data Type Analysis (analyze_data_types)**
 - **Functionality:** Checks expected feature groups (numeric, categorical, temporal, binary, discrete).
 - **Logic:** Verifies column presence per group and prints dtype diagnostics for each column.
 
 ![Data Type Analysis](ReadMe-Images/Data%20Type%20Analysis.png)
+*Figure 7: Data type analysis and feature group validation.*
 
 3. **Feature Engineering (feature_engineering)**
 - **Functionality:** Creates additional features for time, weather, route context, and cyclic hour encoding.
 - **Logic:** Derives hour, day_of_week, is_weekend, route, is_rush_hour, is_bad_weather, speed_normal, hour_sin, and hour_cos.
 
 ![Feature Engineering](ReadMe-Images/Feature%20Engineering.png)
+*Figure 8: Feature engineering process and derived features.*
 
 4. **Data Cleaning (clean_data)**
 - **Functionality:** Handles missing values and prepares robust numeric features.
 - **Logic:** Fills numeric nulls with median values, reports selected-column IQR counts, and applies 1%-99% winsorization to `delay_min` and `speed_normal`.
 
 ![Data Cleaning](ReadMe-Images/Data%20Cleaning.png)
+*Figure 9: Data cleaning with imputation and winsorization.*
 
 5. **Categorical Encoding (encode_features)**
 - **Functionality:** Converts route text into model-ready binary indicators.
 - **Logic:** Uses one-hot encoding via pd.get_dummies for the route feature.
 
 ![Categorical Encoding](ReadMe-Images/Categorical%20Encoding.png)
+*Figure 10: Categorical encoding of route feature.*
 
 6. **Column Pruning (drop_unused_columns)**
 - **Functionality:** Drops raw, non-model columns and leakage-prone fields.
 - **Logic:** Removes timestamp, origin, destination, route, hour, rain, and duration_traffic_min.
 
 ![Column Pruning](ReadMe-Images/Column%20Pruning.png)
+*Figure 11: Column pruning and feature selection.*
 
 7. **Target Creation (create_target)**
 - **Functionality:** Defines the prediction target based on selected ML task.
 - **Logic:** Uses delay_min for regression or generates traffic_level bins for classification.
 
 ![Target Creation](ReadMe-Images/Target%20Creation.png)
+*Figure 12: Target variable creation for regression task.*
 
 8. **Quality and Completeness (analyze_data_quality, profile_completeness)**
 - **Functionality:** Reports dataset quality after transformations.
 - **Logic:** Computes missing values, duplicates, quality score, and completeness metrics.
 
 ![Quality and Completeness](ReadMe-Images/Quality%20and%20Completeness.png)
+*Figure 13: Data quality and completeness analysis.*
 
 9. **Terminal Report (print_full_terminal_report)**
 - **Functionality:** Generates a full end-of-pipeline textual summary.
@@ -255,6 +263,7 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 - **Logic:** Writes cleaned dataset CSV and structured JSON report into outputs.
 
 ![Output Export](ReadMe-Images/Output%20Export.png)
+*Figure 14: Output export to CSV and JSON formats.*
 
 ## Phase 2 - Outlier Analysis and Training
 
@@ -263,18 +272,21 @@ Since we observe strong linear relationships (e.g., Temperature ~ Delay), a **Li
 - **Logic:** Uses IQR, top-1% thresholds, and contextual rules to separate normal, valid, suspicious, and invalid rows, then generates diagnostic plots and a structured summary.
 
 ![Outlier Detection](ReadMe-Images/Outlier.png)
+*Figure 15: True outlier detection and classification.*
 
 12. **Regression Experiments (evaluate_regression_outlier_experiments)**
 - **Functionality:** Compares model performance with outliers versus after removing suspicious/invalid rows.
 - **Logic:** Trains two Random Forest regressors on the same holdout split and exports comparison metrics plus a visualization.
 
 ![With vs Without Outliers](outputs/model_evaluation/metrics_with_vs_without_outliers.png)
+*Figure 16: Regression performance comparison with and without outlier handling.*
 
 13. **Final Regression Training (train_final_regression_model)**
 - **Functionality:** Trains the final regression model and exports the production-ready artifacts.
 - **Logic:** Uses sample weighting for outlier-aware learning, then saves the model, predictions, feature importances, and actual-vs-predicted plot.
 
 ![Final Model Evaluation](outputs/final_model/actual_vs_predicted.png)
+*Figure 17: Final weighted RandomForest model performance (actual vs predicted).*
 
 14. **Dual-Model Experiment (modeling_pipeline.py)**
 - **Functionality:** Tests a post-cleaning experimental setup: baseline single model vs dual-model routing.
@@ -385,6 +397,7 @@ The tuning visualization provides interpretability insights:
 - saves plots into [outputs/skewness_plots/](outputs/skewness_plots/)
 
 ![Skewness Analysis](ReadMe-Images/Skewness.png)
+*Figure 18: Skewness analysis and histogram/boxplot generation.*
 
 ### Algorithm Comparison: [alternative_algorithms.py](alternative_algorithms.py)
 
@@ -456,7 +469,7 @@ We evaluated multiple supervised and unsupervised algorithms to predict traffic 
 **Visualization of Algorithm Performance:**
 
 ![Algorithm Comparison](outputs/algorithm_comparison/algorithm_comparison.png)
-*Figure 11: Comparison of supervised algorithms before and after K-Means clustering enhancement.*
+*Figure 19: Comparison of supervised algorithms before and after K-Means clustering enhancement.*
 
 ### Algorithm Comparison Analysis
 
@@ -560,7 +573,7 @@ Generated comparison and training artifacts:
 | **With vs Without Outliers** | **Final Model Fit** |
 | :---: | :---: |
 | ![With vs Without Outliers](outputs/model_evaluation/metrics_with_vs_without_outliers.png) | ![Actual vs Predicted](outputs/final_model/actual_vs_predicted.png) |
-| *Figure 9: Comparison of regression performance with and without outlier handling.* | *Figure 10: Actual vs predicted delay for the final weighted model.* |
+| *Figure 16: Regression performance comparison with and without outlier handling.* | *Figure 17: Final weighted RandomForest model performance (actual vs predicted).* |
 
 ### Algorithm Comparison Summary
 
@@ -593,13 +606,14 @@ Visual comparison:
 | **Algorithm Comparison** |
 | :---: |
 | ![Algorithm Comparison](outputs/algorithm_comparison/algorithm_comparison.png) |
-| *Figure 11: Side-by-side comparison of supervised algorithms before and after K-Means clustering enhancement.* |
+| *Figure 19: Side-by-side comparison of supervised algorithms before and after K-Means clustering enhancement.* |
 
 ### Hyperparameter Tuning Summary (Phase 3A)
 
 **RandomForest Hyperparameter Optimization using GridSearchCV:**
 
 ![Phase 3A Tuning Results](outputs/fine_tuning/tuning_results.png)
+*Figure 20: GridSearchCV hyperparameter tuning results (4-panel visualization).*
 
 Grid Search Configuration:
 - **Parameter Space:** 18 combinations tested
@@ -719,22 +733,22 @@ Generated plots:
 | **Distance KM Distribution** | **Speed Normal Distribution** |
 | :---: | :---: |
 | ![Distance KM Distribution and Outliers](outputs/skewness_plots/distance_km.png) | ![Speed Normal Distribution and Outliers](outputs/skewness_plots/speed_normal.png) |
-| *Figure 1: Histogram and boxplot for distance_km.* | *Figure 2: Histogram and boxplot for speed_normal.* |
+| *Figure 21: Histogram and boxplot for distance_km.* | *Figure 22: Histogram and boxplot for speed_normal.* |
 
 | **Delay Distribution** | **Duration Normal Distribution** |
 | :---: | :---: |
 | ![Delay Distribution and Outliers](outputs/skewness_plots/delay_min.png) | ![Duration Normal Distribution and Outliers](outputs/skewness_plots/duration_normal_min.png) |
-| *Figure 3: Histogram and boxplot for delay_min.* | *Figure 4: Histogram and boxplot for duration_normal_min.* |
+| *Figure 23: Histogram and boxplot for delay_min.* | *Figure 24: Histogram and boxplot for duration_normal_min.* |
 
 | **Temperature Distribution** | **Wind Distribution** |
 | :---: | :---: |
 | ![Temperature Distribution and Outliers](outputs/skewness_plots/temperature.png) | ![Wind Distribution and Outliers](outputs/skewness_plots/wind.png) |
-| *Figure 5: Histogram and boxplot for temperature.* | *Figure 6: Histogram and boxplot for wind.* |
+| *Figure 25: Histogram and boxplot for temperature.* | *Figure 26: Histogram and boxplot for wind.* |
 
 | **Hour Sin Distribution** | **Hour Cos Distribution** |
 | :---: | :---: |
 | ![Hour Sin Distribution and Outliers](outputs/skewness_plots/hour_sin.png) | ![Hour Cos Distribution and Outliers](outputs/skewness_plots/hour_cos.png) |
-| *Figure 7: Histogram and boxplot for hour_sin.* | *Figure 8: Histogram and boxplot for hour_cos.* |
+| *Figure 27: Histogram and boxplot for hour_sin.* | *Figure 28: Histogram and boxplot for hour_cos.* |
 
 ### Phase 2 - Detailed Outlier Analysis Plots
 
@@ -742,41 +756,41 @@ The project generates comprehensive outlier analysis visualizations to understan
 
 #### Outlier Type Distribution
 ![Outlier Type Distribution](outputs/outlier_analysis/bar_outlier_type_counts.png)
-*Figure: Distribution of normal, valid, suspicious, and invalid traffic observations.*
+*Figure 29: Distribution of normal, valid, suspicious, and invalid traffic observations.*
 
 #### Delay Analysis for Outliers vs Normal
 ![Delay Distribution: Outliers vs Normal](outputs/outlier_analysis/hist_delay_outliers_vs_normal.png)
-*Figure: Histogram comparing delay distributions for outlier and normal traffic patterns.*
+*Figure 30: Histogram comparing delay distributions for outlier and normal traffic patterns.*
 
 #### Delay vs Temperature (Scatter Plot)
 ![Delay vs Temperature](outputs/outlier_analysis/scatter_delay_vs_temperature.png)
-*Figure: Relationship between temperature and traffic delay, showing weather impact on congestion.*
+*Figure 31: Relationship between temperature and traffic delay, showing weather impact on congestion.*
 
 #### Delay vs Speed (Scatter Plot)
 ![Delay vs Speed](outputs/outlier_analysis/scatter_delay_vs_speed_normal.png)
-*Figure: Correlation between normal driving speed and delay magnitude.*
+*Figure 32: Correlation between normal driving speed and delay magnitude.*
 
 #### Impact of Rush Hour on Delay (Boxplot)
 ![Delay vs Rush Hour](outputs/outlier_analysis/boxplot_delay_vs_rush_hour.png)
-*Figure: Boxplot showing significant delay differences during rush hours vs normal periods.*
+*Figure 33: Boxplot showing significant delay differences during rush hours vs normal periods.*
 
 #### Impact of Bad Weather on Delay (Boxplot)
 ![Delay vs Bad Weather](outputs/outlier_analysis/boxplot_delay_vs_bad_weather.png)
-*Figure: Boxplot demonstrating weather's substantial impact on traffic delays.*
+*Figure 34: Boxplot demonstrating weather's substantial impact on traffic delays.*
 
 #### Correlation Matrix - Full Dataset
 ![Correlation Matrix (Full Dataset)](outputs/outlier_analysis/correlation_full_dataset.png)
-*Figure: Heatmap showing feature correlations in complete dataset.*
+*Figure 35: Heatmap showing feature correlations in complete dataset.*
 
 #### Correlation Matrix - Outliers Only
 ![Correlation Matrix (Outliers Only)](outputs/outlier_analysis/correlation_outliers_only.png)
-*Figure: Heatmap showing feature correlations within outlier subset, revealing different patterns.*
+*Figure 36: Heatmap showing feature correlations within outlier subset, revealing different patterns.*
 
 ### Phase 2 - Final Model Performance
 
 #### Feature Importance - Top 15 Features
 ![Feature Importance Top 15](outputs/final_model/feature_importance_top15.png)
-*Figure: Ranking of 15 most important features in the final trained model.*
+*Figure 37: Ranking of 15 most important features in the final trained model.*
 
 ### Output Files
 
