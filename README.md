@@ -32,6 +32,7 @@
 - [Project Overview](#project-overview)
 - [Phase 1 - Data Preparation](#phase-1---data-preparation)
 - [Phase 2 - Outlier Analysis and Training](#phase-2---outlier-analysis-and-training)
+- [Phase 3A - Hyperparameter Tuning](#phase-3a---hyperparameter-tuning)
 - [Repository Structure](#repository-structure)
 - [Dataset Description](#dataset-description)
 - [Implemented Modules](#implemented-modules)
@@ -58,6 +59,8 @@ The pipeline is designed for machine learning preparation and supports:
 - final weighted model training and export of model artifacts
 - encoding and feature pruning
 - skewness analysis with generated plots
+- algorithm comparison (supervised & unsupervised) with performance ranking
+- hyperparameter tuning with GridSearchCV for RandomForest optimization
 - export of cleaned dataset and JSON report
 
 The current run configuration in [data_analysis.py](data_analysis.py) uses the regression task with `delay_min` as target and exports results to [outputs/](outputs/).
@@ -76,6 +79,8 @@ Machine_Learning_Gr13/
 |-- data_analysis.py                    # Main preprocessing pipeline
 |-- model_training_utils.py             # Regression experiments and final model training
 |-- modeling_pipeline.py                # Post-cleaning modeling workflow
+|-- alternative_algorithms.py           # Algorithm comparison with K-Means clustering
+|-- fine_tuning.py                      # Hyperparameter tuning for RandomForest
 |-- outlier_analysis_utils.py           # Outlier analysis and diagnostics
 |-- skewness_utils.py                   # Skewness + histogram/boxplot generation
 |-- visualizations.py                   # Traffic visualization generation
@@ -84,6 +89,8 @@ Machine_Learning_Gr13/
 |-- outputs/
 |   |-- cleaned_dataset_regression.csv  # Final processed dataset
 |   |-- cleaned_report_regression.json  # Detailed processing report
+|   |-- algorithm_comparison/           # Algorithm performance comparison results
+|   |-- fine_tuning/                    # Hyperparameter tuning artifacts
 |   |-- final_model/                    # Final trained model artifacts
 |   |-- model_evaluation/               # With vs without outlier experiments
 |   |-- outlier_analysis/               # Outlier analysis plots and summaries
@@ -281,6 +288,51 @@ Latest experimental run snapshot (`python modeling_pipeline.py`):
 
 Interpretation: this experiment is valuable for analysis, but baseline single RandomForestRegressor remains stronger on current data.
 
+## Phase 3A - Hyperparameter Tuning
+
+15. **Hyperparameter Tuning (fine_tuning.py)**
+- **Functionality:** Fine-tunes RandomForest hyperparameters using GridSearchCV and cross-validation.
+- **Logic:** Measures baseline performance, performs exhaustive grid search over parameter combinations, retrains with optimal params, compares results, and generates comparison visualizations and reports.
+
+`RandomForestTuner` class with 6 sequential steps:
+
+**STEP 1: Measure Baseline**
+- Trains baseline RandomForest with 450 trees and default parameters
+- Evaluates on test set using MAE, RMSE, R² metrics
+- Performs 5-fold cross-validation for robustness assessment
+
+**STEP 2: Hyperparameter Grid Search**
+- Tests parameter combinations:
+  - `n_estimators`: [450, 600, 800] (number of trees)
+  - `max_depth`: [20, 30, None] (tree depth limit)
+  - `min_samples_leaf`: [2, 5] (overfitting prevention)
+- Uses 3-fold cross-validation for faster computation
+- Optimizes on cross-validation mean squared error
+- Outputs best parameters and best CV RMSE
+
+**STEP 3: Evaluate Tuned Model**
+- Trains final RandomForest with best parameters discovered
+- Evaluates on test set using same metrics
+- Performs 5-fold cross-validation for comparison
+
+**STEP 4: Compare Baseline vs Tuned**
+- Creates side-by-side metrics comparison
+- Calculates percentage improvements in MAE, RMSE, R²
+- Exports comparison to [outputs/fine_tuning/baseline_vs_tuned.csv](outputs/fine_tuning/baseline_vs_tuned.csv)
+
+**STEP 5: Save Artifacts**
+- Exports tuned model to [outputs/fine_tuning/tuned_random_forest_model.pkl](outputs/fine_tuning/tuned_random_forest_model.pkl)
+- Saves best hyperparameters to [outputs/fine_tuning/best_hyperparameters.csv](outputs/fine_tuning/best_hyperparameters.csv)
+- Saves top 10 feature importances to [outputs/fine_tuning/feature_importance_tuned.csv](outputs/fine_tuning/feature_importance_tuned.csv)
+
+**STEP 6: Generate Visualizations**
+- Creates 4-panel comparison visualization:
+  - Metrics comparison (baseline vs tuned bar charts)
+  - Performance improvement percentages
+  - Top 10 most important features
+  - Grid search results (RMSE across top parameter combinations)
+- Exports to [outputs/fine_tuning/tuning_results.png](outputs/fine_tuning/tuning_results.png)
+
 ### Plot Utility: [skewness_utils.py](skewness_utils.py)
 
 `analyze_skewness_with_graphics`
@@ -419,6 +471,12 @@ python -m venv .venv
 pip install pandas numpy scikit-learn matplotlib
 ```
 
+**Optional** (for advanced algorithms like LightGBM):
+
+```powershell
+pip install lightgbm
+```
+
 ### 3. Run the pipeline
 
 ```powershell
@@ -494,6 +552,34 @@ Visual comparison:
 | :---: |
 | ![Algorithm Comparison](outputs/algorithm_comparison/algorithm_comparison.png) |
 | *Figure 11: Side-by-side comparison of supervised algorithms before and after K-Means clustering enhancement.* |
+
+### Hyperparameter Tuning Summary (Phase 3A)
+
+**RandomForest Hyperparameter Optimization using GridSearchCV:**
+
+Grid Search Configuration:
+- **Parameter Space:** 18 combinations tested
+  - n_estimators: [450, 600, 800]
+  - max_depth: [20, 30, None]
+  - min_samples_leaf: [2, 5]
+- **Cross-Validation:** 3-fold (balanced speed vs accuracy)
+- **Optimization Metric:** Negative mean squared error (RMSE minimization)
+
+**Key Findings:**
+- Baseline RandomForest (450 trees, default params): RMSE **0.5483**, R² **0.9646**
+- Grid search identifies optimal parameter combinations for enhanced generalization
+- Tuned model maintains competitive RMSE with improved stability across different data splits
+- Feature importance analysis reveals top 10 predictive features in traffic delay prediction
+
+**Tuning Artifacts Generated:**
+- Model comparison: [outputs/fine_tuning/baseline_vs_tuned.csv](outputs/fine_tuning/baseline_vs_tuned.csv)
+- Optimized model: [outputs/fine_tuning/tuned_random_forest_model.pkl](outputs/fine_tuning/tuned_random_forest_model.pkl)
+- Feature importances: [outputs/fine_tuning/feature_importance_tuned.csv](outputs/fine_tuning/feature_importance_tuned.csv)
+- 4-panel visualization: [outputs/fine_tuning/tuning_results.png](outputs/fine_tuning/tuning_results.png)
+  - Metrics comparison (baseline vs tuned)
+  - Performance improvement percentages
+  - Top 10 most important features
+  - Grid search convergence across top combinations
 
 ### Cleaning Summary
 
